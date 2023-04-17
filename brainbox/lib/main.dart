@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +6,7 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatelessWidget { //Definiert einige Randdetails der App
   const MyApp({super.key});
 
   @override
@@ -16,7 +14,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: MaterialApp(
-        title: 'BrainBox',
+        title: 'Namer App',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
@@ -27,132 +25,85 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
-  var history = <WordPair>[];
-
-  GlobalKey? historyListKey;
 
   void getNext() {
-    history.insert(0, current);
-    var animatedList = historyListKey?.currentState as AnimatedListState?;
-    animatedList?.insertItem(0);
     current = WordPair.random();
     notifyListeners();
   }
 
-  var favorites = <WordPair>[];
+  var favorites = <WordPair>[];                   //Liste für gespeicherte Favoriten Wortpaare
 
-  void toggleFavorite([WordPair? pair]) {
-    pair = pair ?? current;
-    if (favorites.contains(pair)) {
-      favorites.remove(pair);
+  void toggleFavorite() {
+    if (favorites.contains(current)) {
+      favorites.remove(current);
+      print('unliked');                          //Wenn Like Button gedrückt + Wort bereits in Liste => entfernen
     } else {
-      favorites.add(pair);
+      favorites.add(current);
+      print('liked');                             //sonst hinzufügen
     }
-    notifyListeners();
-  }
-
-  void removeFavorite(WordPair pair) {
-    favorites.remove(pair);
-    notifyListeners();
+    notifyListeners();                            //Benachrichtigung an alle Widgets, die MyAppState nutzen
   }
 }
-
-class MyHomePage extends StatefulWidget {
+ 
+class MyHomePage extends StatefulWidget {         //Widget von MyHomePage (quasi gesamter Bildschirm)
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHomePage; Private Klasse, da nur in MyHomePage verwendet
+  
   var selectedIndex = 0;
-
+  
   @override
   Widget build(BuildContext context) {
-    var colorScheme = Theme.of(context).colorScheme;
-
+    
     Widget page;
     switch (selectedIndex) {
-      case 0:
-        page = GeneratorPage();
-        break;
-      case 1:
-        page = FavoritesPage();
-        break;
-      default:
-        throw UnimplementedError('no widget for $selectedIndex');
+    case 0:
+      page = GeneratorPage();
+      break;
+    case 1:
+      page = FavoritesPage();
+      break;
+    default:
+      throw UnimplementedError('no widget for $selectedIndex');
     }
 
-    // The container for the current page, with its background color
-    // and subtle switching animation.
-    var mainArea = ColoredBox(
-      color: colorScheme.surfaceVariant,
-      child: AnimatedSwitcher(
-        duration: Duration(milliseconds: 200),
-        child: page,
-      ),
-    );
-
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth < 450) {
-            // Use a more mobile-friendly layout with BottomNavigationBar
-            // on narrow screens.
-            return Column(
-              children: [
-                Expanded(child: mainArea),
-                SafeArea(
-                  child: BottomNavigationBar(
-                    items: [
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.home),
-                        label: 'Home',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.favorite),
-                        label: 'Favorites',
-                      ),
-                    ],
-                    currentIndex: selectedIndex,
-                    onTap: (value) {
-                      setState(() {
-                        selectedIndex = value;
-                      });
-                    },
-                  ),
-                )
-              ],
-            );
-          } else {
-            return Row(
-              children: [
-                SafeArea(
-                  child: NavigationRail(
-                    extended: constraints.maxWidth >= 600,
-                    destinations: [
-                      NavigationRailDestination(
-                        icon: Icon(Icons.home),
-                        label: Text('Home'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.favorite),
-                        label: Text('Favorites'),
-                      ),
-                    ],
-                    selectedIndex: selectedIndex,
-                    onDestinationSelected: (value) {
-                      setState(() {
-                        selectedIndex = value;
-                      });
-                    },
-                  ),
+      body: Row(                                  //Reihe; enthält gesamte Appseite, Navbar+Generator
+        children: [
+          SafeArea(                               //Widget linke Seite, Navigation Bar, dass für Abstand zu Notch, Statusleiste etc. sorgt
+            child: NavigationRail(
+              extended: false,
+              destinations: [
+                NavigationRailDestination(        //Home Button
+                  icon: Icon(Icons.home),
+                  label: Text('Home'),
                 ),
-                Expanded(child: mainArea),
+                NavigationRailDestination(        //Favoriten Button
+                  icon: Icon(Icons.favorite),
+                  label: Text('Favorites'),
+                ),
               ],
-            );
-          }
-        },
+              selectedIndex: selectedIndex,       //Index des ausgewählten Buttons, Start bei 0
+              onDestinationSelected: (value) {    //Funktion, die ausgeführt wird, wenn Button gedrückt
+                setState(() {                     //setState, damit Widget neu gebaut wird (quasi refresh, changeNotifyer)
+                  selectedIndex = value;          //Index des ausgewählten Buttons auf Wert der Destination setzen}
+                  print(value);                   //Konsolenausgabe, um zu sehen, ob Button erkannt wird
+               });                                //Resultat: Klick auf Herz wird nicht nur erkannt sondern auch angezeigt
+              },
+            ), 
+          ),
+          Expanded(                                 //Widget rechte Seite, Generator Page (Expanded gibt Widget so viel Platz wie möglich)
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: page,                        //Variable page aufrufen als Inhalt; based on selectedIndex wird die entsprechende Seite aufgerufen
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -160,92 +111,71 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class GeneratorPage extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    var pair = appState.current;
+  Widget build(BuildContext context) {              //Zu jedem Widget gehört eine Build Funktion
+    var appState = context.watch<MyAppState>();     //Variable appState mit Klasse MyAppState linken
+    var pair = appState.current;                    //aktuelles Wort in pair speichern
 
     IconData icon;
     if (appState.favorites.contains(pair)) {
-      icon = Icons.favorite;
+      icon = Icons.favorite;                        //wenn akt. Begriff in Favoritenliste, dann ausgefülltes Herz
     } else {
-      icon = Icons.favorite_border;
+      icon = Icons.favorite_border;                 //sonst leeres Herz
     }
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            flex: 3,
-            child: HistoryListView(),
-          ),
-          SizedBox(height: 10),
-          BigCard(pair: pair),
-          SizedBox(height: 10),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () {
-                  appState.toggleFavorite();
-                },
-                icon: Icon(icon),
-                label: Text('Like'),
-              ),
-              SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () {
-                  appState.getNext();
-                },
-                child: Text('Next'),
-              ),
-            ],
-          ),
-          Spacer(flex: 2),
-        ],
-      ),
-    );
+    return Center(                                 //Zentrieren des Widgets (waagerechte)
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,  //Zentrieren der Spalte (senkrechte)
+
+          children: [
+            BigCard(pair: pair),                    //aktuelles Wort in Kleinbuchstaben ausgeben s.u.
+            SizedBox(height: 20),                   //Abstandshalter zwischen Karte und Button
+            
+            Row(
+              mainAxisSize: MainAxisSize.min,       //alle Elemente/Button zentrieren
+              children: [
+                ElevatedButton.icon(                //Icon-Button mit zusätzl. Text
+                  onPressed: () {
+                    appState.toggleFavorite();      //Wenn Button gedrückt Like-Funktion aufrufen
+                  },
+                  icon: Icon(icon),                 //Button Icon (s.o. Fkt. IconData icon)
+                  label: Text('Like'),              //Button Text
+                  ),
+                 SizedBox(width: 15),               //Abstandshalter zwischen Buttons 
+                ElevatedButton(                     //Normaler Button, um nächstes Wort zu generieren
+                  onPressed: () {                   //Wenn Button gedrückt
+                   appState.getNext();              //Neues Wort generieren durch getNext()
+                  },
+                child: Text('Next'),                //Button Text
+                ),
+              ]
+            ),
+          ],  //children
+        ),
+      );
   }
 }
 
-class BigCard extends StatelessWidget {
+class BigCard extends StatelessWidget {             //Widget BigCard, gibt Wortpaar aus
   const BigCard({
-    Key? key,
+    super.key,
     required this.pair,
-  }) : super(key: key);
+  });
 
   final WordPair pair;
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);
+    var theme = Theme.of(context);                  //Pointer zu Theme der App (in MyApp festgelegt)
     var style = theme.textTheme.displayMedium!.copyWith(
-      color: theme.colorScheme.onPrimary,
-    );
+      color: theme.colorScheme.onPrimary);          //Schriftart/-farbe der Karte
 
     return Card(
-      color: theme.colorScheme.primary,
+      color: theme.colorScheme.primary,             //Farbe der Karte, festgelegt in MyApp
       child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: AnimatedSize(
-          duration: Duration(milliseconds: 200),
-          // Make sure that the compound word wraps correctly when the window
-          // is too narrow.
-          child: MergeSemantics(
-            child: Wrap(
-              children: [
-                Text(
-                  pair.first,
-                  style: style.copyWith(fontWeight: FontWeight.w200),
-                ),
-                Text(
-                  pair.second,
-                  style: style.copyWith(fontWeight: FontWeight.bold),
-                )
-              ],
-            ),
-          ),
-        ),
+        padding: const EdgeInsets.all(15),          //Außenabstand der Karte
+        child: Text(pair.asLowerCase,               //Karte mit Wort füllen
+        style: style,                               //Textfarbe/-schrift
+        semanticsLabel: pair.asPascalCase,),        //Für Screenreader gedacht                   
       ),
     );
   }
@@ -254,7 +184,6 @@ class BigCard extends StatelessWidget {
 class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);
     var appState = context.watch<MyAppState>();
 
     if (appState.favorites.isEmpty) {
@@ -263,102 +192,19 @@ class FavoritesPage extends StatelessWidget {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return ListView(                                //eine Spalte, die man scrollen kann
       children: [
         Padding(
-          padding: const EdgeInsets.all(30),
+          padding: const EdgeInsets.all(20),
           child: Text('You have '
-              '${appState.favorites.length} favorites:'),
+              '${appState.favorites.length} favorites:'), //Anzahl der Favoriten
         ),
-        Expanded(
-          // Make better use of wide windows with a grid.
-          child: GridView(
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 400,
-              childAspectRatio: 400 / 80,
-            ),
-            children: [
-              for (var pair in appState.favorites)
-                ListTile(
-                  leading: IconButton(
-                    icon: Icon(Icons.delete_outline, semanticLabel: 'Delete'),
-                    color: theme.colorScheme.primary,
-                    onPressed: () {
-                      appState.removeFavorite(pair);
-                    },
-                  ),
-                  title: Text(
-                    pair.asLowerCase,
-                    semanticsLabel: pair.asPascalCase,
-                  ),
-                ),
-            ],
+        for (var pair in appState.favorites)
+          ListTile(
+            leading: Icon(Icons.favorite),
+            title: Text(pair.asLowerCase),
           ),
-        ),
       ],
-    );
-  }
-}
-
-class HistoryListView extends StatefulWidget {
-  const HistoryListView({Key? key}) : super(key: key);
-
-  @override
-  State<HistoryListView> createState() => _HistoryListViewState();
-}
-
-class _HistoryListViewState extends State<HistoryListView> {
-  /// Needed so that [MyAppState] can tell [AnimatedList] below to animate
-  /// new items.
-  final _key = GlobalKey();
-
-  /// Used to "fade out" the history items at the top, to suggest continuation.
-  static const Gradient _maskingGradient = LinearGradient(
-    // This gradient goes from fully transparent to fully opaque black...
-    colors: [Colors.transparent, Colors.black],
-    // ... from the top (transparent) to half (0.5) of the way to the bottom.
-    stops: [0.0, 0.5],
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    final appState = context.watch<MyAppState>();
-    appState.historyListKey = _key;
-
-    return ShaderMask(
-      shaderCallback: (bounds) => _maskingGradient.createShader(bounds),
-      // This blend mode takes the opacity of the shader (i.e. our gradient)
-      // and applies it to the destination (i.e. our animated list).
-      blendMode: BlendMode.dstIn,
-      child: AnimatedList(
-        key: _key,
-        reverse: true,
-        padding: EdgeInsets.only(top: 100),
-        initialItemCount: appState.history.length,
-        itemBuilder: (context, index, animation) {
-          final pair = appState.history[index];
-          return SizeTransition(
-            sizeFactor: animation,
-            child: Center(
-              child: TextButton.icon(
-                onPressed: () {
-                  appState.toggleFavorite(pair);
-                },
-                icon: appState.favorites.contains(pair)
-                    ? Icon(Icons.favorite, size: 12)
-                    : SizedBox(),
-                label: Text(
-                  pair.asLowerCase,
-                  semanticsLabel: pair.asPascalCase,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
     );
   }
 }
