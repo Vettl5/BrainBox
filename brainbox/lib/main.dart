@@ -68,6 +68,9 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
     case 1:
       page = FavoritesPage();
       break;
+    case 2:
+      page =  Placeholder();                      //wird Einstellungen Seite, noch ungenutzt
+      break;
     default:
       throw UnimplementedError('no widget for $selectedIndex');
     }
@@ -80,18 +83,18 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
               extended: false,
               destinations: [
                 NavigationRailDestination(        //Home Button
-                  icon: Icon(Icons.home),
+                  icon: Icon(Icons.home),         //Haus Icon
                   label: Text('Home'),
                 ),
                 NavigationRailDestination(        //Favoriten Button
-                  icon: Icon(Icons.favorite),
+                  icon: Icon(Icons.favorite),     //Herz Icon
                   label: Text('Favorites'),
                 ),
               ],
-              selectedIndex: selectedIndex,       //Index des ausgewählten Buttons, Start bei 0
+              selectedIndex: selectedIndex,       //selectedIndex von onDestinationSelected auf var selectedIndex setzen (s.o.)
               onDestinationSelected: (value) {    //Funktion, die ausgeführt wird, wenn Button gedrückt
-                setState(() {                     //setState, damit Widget neu gebaut wird (quasi refresh, changeNotifyer)
-                  selectedIndex = value;          //Index des ausgewählten Buttons auf Wert der Destination setzen}
+                setState(() {                     //setState, damit MyHomePage Widget neu gebaut wird (quasi refresh, changeNotifyer)
+                  selectedIndex = value;          //var selectedIndex auf Wert der Destination setzen
                   print(value);                   //Konsolenausgabe, um zu sehen, ob Button erkannt wird
                });                                //Resultat: Klick auf Herz wird nicht nur erkannt sondern auch angezeigt
               },
