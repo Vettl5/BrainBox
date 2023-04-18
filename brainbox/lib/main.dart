@@ -63,10 +63,10 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
     Widget page;
     switch (selectedIndex) {
     case 0:
-      page = GeneratorPage();
+      page = ListsPage();
       break;
     case 1:
-      page = FavoritesPage();
+      page = CategoriesPage();
       break;
     case 2:
       page =  Placeholder();                      //wird Einstellungen Seite, noch ungenutzt
@@ -90,6 +90,10 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
                   icon: Icon(Icons.favorite),     //Herz Icon
                   label: Text('Favorites'),
                 ),
+                NavigationRailDestination(        //Settings Button
+                  icon: Icon(Icons.settings),     //Zahnrad Icon
+                  label: Text('Settings'),
+                ),
               ],
               selectedIndex: selectedIndex,       //selectedIndex von onDestinationSelected auf var selectedIndex setzen (s.o.)
               onDestinationSelected: (value) {    //Funktion, die ausgeführt wird, wenn Button gedrückt
@@ -112,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
   }
 }
 
-class GeneratorPage extends StatelessWidget {
+class ListsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {              //Zu jedem Widget gehört eine Build Funktion
     var appState = context.watch<MyAppState>();     //Variable appState mit Klasse MyAppState linken
@@ -130,10 +134,15 @@ class GeneratorPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,  //Zentrieren der Spalte (senkrechte)
 
           children: [
-            BigCard(pair: pair),                    //aktuelles Wort in Kleinbuchstaben ausgeben s.u.
+            
+            
+            
+            
+            
+            /*BigCard(pair: pair),                  //aktuelles Wort in Kleinbuchstaben ausgeben s.u.
             SizedBox(height: 20),                   //Abstandshalter zwischen Karte und Button
             
-            Row(
+            Row(                                    //Reihe für Buttons
               mainAxisSize: MainAxisSize.min,       //alle Elemente/Button zentrieren
               children: [
                 ElevatedButton.icon(                //Icon-Button mit zusätzl. Text
@@ -151,14 +160,14 @@ class GeneratorPage extends StatelessWidget {
                 child: Text('Next'),                //Button Text
                 ),
               ]
-            ),
+            ),*/
           ],  //children
         ),
       );
   }
 }
 
-class BigCard extends StatelessWidget {             //Widget BigCard, gibt Wortpaar aus
+/*class BigCard extends StatelessWidget {             //Widget BigCard, gibt Wortpaar aus
   const BigCard({
     super.key,
     required this.pair,
@@ -181,10 +190,9 @@ class BigCard extends StatelessWidget {             //Widget BigCard, gibt Wortp
         semanticsLabel: pair.asPascalCase,),        //Für Screenreader gedacht                   
       ),
     );
-  }
-}
+ */
 
-class FavoritesPage extends StatelessWidget {
+class CategoriesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
