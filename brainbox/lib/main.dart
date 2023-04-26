@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget { //Definiert einige Randdetails der App
         ),
         home: MyHomePage(),
         routes: {
-          '/': (context) => MyHomePage(),
           '/bearbeiten': (context) => NotizBearbeiten(),
         },
       ),
@@ -33,16 +32,8 @@ class MyApp extends StatelessWidget { //Definiert einige Randdetails der App
 
 
 class MyAppState extends ChangeNotifier {
-  late Directory appDocumentsDir; // Verzeichnis für App-Dokumente
 
-  // Konstruktor
-  MyAppState() {
-    _initAppDir();
-  }
-
-  void _initAppDir() async {
-    appDocumentsDir = await getApplicationDocumentsDirectory();
-  }
+  
 }
  
 
@@ -116,22 +107,20 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
   }
 }
 
+
 class Notizen extends StatelessWidget {
   const Notizen({super.key});
   @override
   Widget build(BuildContext context) {                              //Zu jedem Widget gehört eine Build Funktion
     var appState = context.watch<MyAppState>();                     //Variable appState mit Klasse MyAppState linken
-    //var pair = appState.current;                                  //aktuelles Wort in pair speichern
+    //Directory appDocumentsDir = appState.appDocumentsDir;
 
-    return ListView(                                                //eine Spalte, die man scrollen kann
+    return ListView(                                        //eine Spalte, die man scrollen kann
+      padding: EdgeInsets.all(16.0),                                // Innenabstand von 16 Pixeln auf allen Seiten
+      shrinkWrap: true,                                             // Passt die Größe des Widgets an den Inhalt an
+      physics: BouncingScrollPhysics(),                             // Ein physikalisches Scrollverhalten, das abprallt
       children: [
-        for (var file in appState.appDocumentsDir.listSync())       //für jedes File in appDocumentsDir
-          ListTile(
-            title: Text(file.path),                                 //Titel des ListTiles ist der Pfad des Files
-            onTap: () {
-              openAndEditFile(context, file as File);
-            },
-          ),  
+        
       ],
     );
   }
@@ -180,49 +169,32 @@ class NotizBearbeiten extends StatelessWidget {
 }
 
 
-/*class NeueNotiz extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-
-    return Center(                                 //Zentrieren des Widgets (waagerechte)
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,  //Zentrieren der Spalte (senkrechte)
-
-          children: [
-            Text('Neue Notizen hier hin', style: Theme.of(context).textTheme.displayMedium),
-            Text('Hier sollen neue Notizen erstellt werden können, die dann in der Notizen Seite angezeigt werden'),
-          ],  //children
-        ),
-      );
-    
-  }
-}*/
-
 class NeueNotiz extends StatefulWidget {
   const NeueNotiz({super.key});
   @override
   State<NeueNotiz> createState() => _NeueNotizState();
 }
 
-class _NeueNotizState extends State<NeueNotiz> {
-  final _formKey = GlobalKey<FormState>(); // Key für Formulareingaben
+class _NeueNotizState extends State<NeueNotiz> {                  //Neue Notiz, die in einem String gespeichert werden soll und benannt werden kann
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
-  
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {  // Wenn alle Formulareingaben gültig sind
-      final name = _nameController.text;
-      if (name.isNotEmpty) { // Wenn ein Name für die Notiz eingegeben wurde
-        // Datei mit dem eingegebenen Namen erstellen
-        var appState = context.watch<MyAppState>();
-        final file = File('${appState.appDocumentsDir.path}/$name.txt');
-        file.createSync();
 
-        // Neue Datei öffnen und bearbeiten
-        openAndEditFile(context, file);
-      }
+  @override
+  void initState() {
+    super.initState();
+    appState = context.read<MyAppState>();
+  }
+
+  void _submitForm() {                                            //Funktion, die die Notiz erstellt, speichert und öffnen veranlasst
+  if (_formKey.currentState!.validate()) {                        //Wenn Eingabe valide, dann Datei generieren, sonst siehe validator (s.u.)
+    final name = _nameController.text;
+    if (name.isNotEmpty) {
+      final newFilePath = appState.appDocumentsDir.path + '/' + name + '.txt';
+      final newFile = File(newFilePath);
+      openAndEditFile(context, newFile);
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -230,14 +202,14 @@ class _NeueNotizState extends State<NeueNotiz> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Form(
-            key: _formKey,
+          Form(                                                             //Eingabeformular Feld
+            key: _formKey,                                                  //Debugging Key für aktuelles Formular, macht Eingabe überprüfbar/zuweisbar
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: TextFormField(
+              child: TextFormField(                                         //Textfeld, in dem der Name der Notiz eingegeben werden kann
                 controller: _nameController,
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
+                  if (value == null || value.isEmpty) {                     //validator prüft, ob Eingabe ungültig ist
                     return 'Sie müssen einen gültigen Namen vergeben!';
                   }
                   return null;
@@ -250,9 +222,9 @@ class _NeueNotizState extends State<NeueNotiz> {
               ),
             ),
           ),
-          SizedBox(height: 20.0),
+          SizedBox(height: 20.0),                                           //Abstandshalter zwischen Textfeld und Button
           ElevatedButton(
-            onPressed: _submitForm,
+            onPressed: _submitForm,                                         //Gültigkeit der Eingabe wird geprüft
             child: Text('Erstellen'),
           ),  //ElevatedButton
         ],  //children
