@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget { //Definiert einige Randdetails der App
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: MaterialApp(
-        title: 'Namer App',
+        title: 'BrainBox',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 92, 124, 182)),
@@ -43,29 +43,12 @@ class MyAppState extends ChangeNotifier {
   void _initAppDir() async {
     appDocumentsDir = await getApplicationDocumentsDirectory();
   }
-  
-  /*var current = WordPair.random();
-
-  void getNext() {
-    current = WordPair.random();
-    notifyListeners();
-  }
-
-  var favorites = <WordPair>[];                   //Liste für gespeicherte Favoriten Wortpaare
-
-  void toggleFavorite() {
-    if (favorites.contains(current)) {
-      favorites.remove(current);
-      print('unliked');                          //Wenn Like Button gedrückt + Wort bereits in Liste => entfernen
-    } else {
-      favorites.add(current);
-      print('liked');                             //sonst hinzufügen
-    }
-    notifyListeners();                            //Benachrichtigung an alle Widgets, die MyAppState nutzen
-  }*/
 }
  
+
+
 class MyHomePage extends StatefulWidget {         //Widget von MyHomePage (quasi gesamter Bildschirm)
+  const MyHomePage({super.key});
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -86,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
       page = NeueNotiz();                         //wird Generator Seite, noch ungenutzt
       break;
     case 2:
-      page = Settings();                       //wird Einstellungen Seite, noch ungenutzt
+      page = Placeholder();                       //wird Einstellungen Seite, noch ungenutzt
       break;
     default:
       throw UnimplementedError('no widget for $selectedIndex');
@@ -95,15 +78,15 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
     return Scaffold(
       body: Column(
         children: [
-          Expanded(                                 //Widget rechte Seite, Generator Page (Expanded gibt Widget so viel Platz wie möglich)
+          SafeArea(                                 //Widget rechte Seite, Generator Page (Expanded gibt Widget so viel Platz wie möglich)
             child: Container(
               color: Theme.of(context).colorScheme.primaryContainer,
-              child: page,                        //Variable page aufrufen als Inhalt; based on selectedIndex wird die entsprechende Seite aufgerufen
+              child: page,                          //Variable page aufrufen als Inhalt; based on selectedIndex wird die entsprechende Seite aufgerufen
             ),
           ),
-          SafeArea(                               //Widget untere Seite, Bottom Navigation Bar, dass für Abstand zu Notch, Statusleiste etc. sorgt
+          BottomAppBar(                             //Widget untere Seite, BottomAppBar mit BottomNavigationBar
             child: BottomNavigationBar(
-              backgroundColor: Colors.white/*Theme.of(context).colorScheme.primary*/,
+              backgroundColor: Colors.white,
               items: const <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
                   icon: Icon(Icons.menu),         
@@ -134,42 +117,34 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
 }
 
 class Notizen extends StatelessWidget {
+  const Notizen({super.key});
   @override
-  Widget build(BuildContext context) {              //Zu jedem Widget gehört eine Build Funktion
-    var appState = context.watch<MyAppState>();     //Variable appState mit Klasse MyAppState linken
-    //var pair = appState.current;                    //aktuelles Wort in pair speichern
+  Widget build(BuildContext context) {                              //Zu jedem Widget gehört eine Build Funktion
+    var appState = context.watch<MyAppState>();                     //Variable appState mit Klasse MyAppState linken
+    //var pair = appState.current;                                  //aktuelles Wort in pair speichern
 
-    return Center(                                 //Zentrieren des Widgets (waagerechte)
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,  //Zentrieren der Spalte (senkrechte)
-
-          children: [
-            /*return ListView(                                //eine Spalte, die man scrollen kann
-                children: [
-                  for (var pair in appState.favorites)
-                    ListTile(
-                      leading: Icon(Icons.favorite),
-                      title: Text(pair.asLowerCase),
-                    ),
-                  void onNoteSelected(File file) {
-                    openAndEditFile(context, file);
-                  }  
-                ],
-              );*/
-
-            Text('Notizen', style: Theme.of(context).textTheme.displayMedium),
-            Text('Hier werden deine Notizen angezeigt'),
-          ],  //children
-        ),
-      );
+    return ListView(                                                //eine Spalte, die man scrollen kann
+      children: [
+        for (var file in appState.appDocumentsDir.listSync())       //für jedes File in appDocumentsDir
+          ListTile(
+            title: Text(file.path),                                 //Titel des ListTiles ist der Pfad des Files
+            onTap: () {
+              openAndEditFile(context, file as File);
+            },
+          ),  
+      ],
+    );
   }
 }
+
 
 void openAndEditFile(BuildContext context, File file) {
   Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': file});
 }
 
+
 class NotizBearbeiten extends StatelessWidget {
+  const NotizBearbeiten({super.key});
   @override
   Widget build(BuildContext context) {
     var args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
@@ -179,6 +154,14 @@ class NotizBearbeiten extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Notiz bearbeiten'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -190,9 +173,12 @@ class NotizBearbeiten extends StatelessWidget {
           ),
         ),
       ),
+      /*Text('Notiz bearbeiten', style: Theme.of(context).textTheme.displayMedium),
+      Text('Hier werden deine Notizen angezeigt'),*/
     );
   }
 }
+
 
 /*class NeueNotiz extends StatelessWidget {
   @override
@@ -214,6 +200,7 @@ class NotizBearbeiten extends StatelessWidget {
 }*/
 
 class NeueNotiz extends StatefulWidget {
+  const NeueNotiz({super.key});
   @override
   State<NeueNotiz> createState() => _NeueNotizState();
 }
@@ -267,15 +254,15 @@ class _NeueNotizState extends State<NeueNotiz> {
           ElevatedButton(
             onPressed: _submitForm,
             child: Text('Erstellen'),
-          ),
-        ],
-      ),
-    );
-  }
-}
+          ),  //ElevatedButton
+        ],  //children
+      ),  //Column
+    ); //Center
+  } //Widget build
+} //_NeueNotizState
 
 
-class Settings extends StatelessWidget {
+/*class Settings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
@@ -292,4 +279,4 @@ class Settings extends StatelessWidget {
       );
     
   }
-}
+}*/
