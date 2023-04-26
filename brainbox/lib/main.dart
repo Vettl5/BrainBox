@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,9 +19,13 @@ class MyApp extends StatelessWidget { //Definiert einige Randdetails der App
         title: 'Namer App',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+          colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 92, 124, 182)),
         ),
         home: MyHomePage(),
+        routes: {
+          '/': (context) => MyHomePage(),
+          '/bearbeiten': (context) => NotizBearbeiten(),
+        },
       ),
     );
   }
@@ -27,7 +33,18 @@ class MyApp extends StatelessWidget { //Definiert einige Randdetails der App
 
 
 class MyAppState extends ChangeNotifier {
-  var current = WordPair.random();
+  late Directory appDocumentsDir; // Verzeichnis für App-Dokumente
+
+  // Konstruktor
+  MyAppState() {
+    _initAppDir();
+  }
+
+  void _initAppDir() async {
+    appDocumentsDir = await getApplicationDocumentsDirectory();
+  }
+  
+  /*var current = WordPair.random();
 
   void getNext() {
     current = WordPair.random();
@@ -45,7 +62,7 @@ class MyAppState extends ChangeNotifier {
       print('liked');                             //sonst hinzufügen
     }
     notifyListeners();                            //Benachrichtigung an alle Widgets, die MyAppState nutzen
-  }
+  }*/
 }
  
 class MyHomePage extends StatefulWidget {         //Widget von MyHomePage (quasi gesamter Bildschirm)
@@ -63,51 +80,51 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
     Widget page;
     switch (selectedIndex) {
     case 0:
-      page = ListsPage();
+      page = Notizen();                           //wird Notizen Seite, noch ungenutzt
       break;
     case 1:
-      page = CategoriesPage();
+      page = NeueNotiz();                         //wird Generator Seite, noch ungenutzt
       break;
     case 2:
-      page =  Placeholder();                      //wird Einstellungen Seite, noch ungenutzt
+      page = Settings();                       //wird Einstellungen Seite, noch ungenutzt
       break;
     default:
       throw UnimplementedError('no widget for $selectedIndex');
     }
 
     return Scaffold(
-      body: Row(                                  //Reihe; enthält gesamte Appseite, Navbar+Generator
+      body: Column(
         children: [
-          SafeArea(                               //Widget linke Seite, Navigation Bar, dass für Abstand zu Notch, Statusleiste etc. sorgt
-            child: NavigationRail(
-              extended: false,
-              destinations: [
-                NavigationRailDestination(        //Home Button
-                  icon: Icon(Icons.home),         //Haus Icon
-                  label: Text('Home'),
-                ),
-                NavigationRailDestination(        //Favoriten Button
-                  icon: Icon(Icons.favorite),     //Herz Icon
-                  label: Text('Favorites'),
-                ),
-                NavigationRailDestination(        //Settings Button
-                  icon: Icon(Icons.settings),     //Zahnrad Icon
-                  label: Text('Settings'),
-                ),
-              ],
-              selectedIndex: selectedIndex,       //selectedIndex von onDestinationSelected auf var selectedIndex setzen (s.o.)
-              onDestinationSelected: (value) {    //Funktion, die ausgeführt wird, wenn Button gedrückt
-                setState(() {                     //setState, damit MyHomePage Widget neu gebaut wird (quasi refresh, changeNotifyer)
-                  selectedIndex = value;          //var selectedIndex auf Wert der Destination setzen
-                  print(value);                   //Konsolenausgabe, um zu sehen, ob Button erkannt wird
-               });                                //Resultat: Klick auf Herz wird nicht nur erkannt sondern auch angezeigt
-              },
-            ), 
-          ),
           Expanded(                                 //Widget rechte Seite, Generator Page (Expanded gibt Widget so viel Platz wie möglich)
             child: Container(
               color: Theme.of(context).colorScheme.primaryContainer,
               child: page,                        //Variable page aufrufen als Inhalt; based on selectedIndex wird die entsprechende Seite aufgerufen
+            ),
+          ),
+          SafeArea(                               //Widget untere Seite, Bottom Navigation Bar, dass für Abstand zu Notch, Statusleiste etc. sorgt
+            child: BottomNavigationBar(
+              backgroundColor: Colors.white/*Theme.of(context).colorScheme.primary*/,
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.menu),         
+                  label: 'Notizen',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.add_circle_outline),     
+                  label: 'Neue Notiz',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.settings),     
+                  label: 'Settings',
+                ),
+              ],
+              currentIndex: selectedIndex,       
+              onTap: (value) {                     
+                setState(() {                     
+                  selectedIndex = value;          
+                  print(value);                   
+                });                                
+              },
             ),
           ),
         ],
@@ -116,106 +133,163 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
   }
 }
 
-class ListsPage extends StatelessWidget {
+class Notizen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {              //Zu jedem Widget gehört eine Build Funktion
     var appState = context.watch<MyAppState>();     //Variable appState mit Klasse MyAppState linken
-    var pair = appState.current;                    //aktuelles Wort in pair speichern
-
-    IconData icon;
-    if (appState.favorites.contains(pair)) {
-      icon = Icons.favorite;                        //wenn akt. Begriff in Favoritenliste, dann ausgefülltes Herz
-    } else {
-      icon = Icons.favorite_border;                 //sonst leeres Herz
-    }
+    //var pair = appState.current;                    //aktuelles Wort in pair speichern
 
     return Center(                                 //Zentrieren des Widgets (waagerechte)
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,  //Zentrieren der Spalte (senkrechte)
 
           children: [
-            
-            
-            
-            
-            
-            /*BigCard(pair: pair),                  //aktuelles Wort in Kleinbuchstaben ausgeben s.u.
-            SizedBox(height: 20),                   //Abstandshalter zwischen Karte und Button
-            
-            Row(                                    //Reihe für Buttons
-              mainAxisSize: MainAxisSize.min,       //alle Elemente/Button zentrieren
-              children: [
-                ElevatedButton.icon(                //Icon-Button mit zusätzl. Text
-                  onPressed: () {
-                    appState.toggleFavorite();      //Wenn Button gedrückt Like-Funktion aufrufen
-                  },
-                  icon: Icon(icon),                 //Button Icon (s.o. Fkt. IconData icon)
-                  label: Text('Like'),              //Button Text
-                  ),
-                 SizedBox(width: 15),               //Abstandshalter zwischen Buttons 
-                ElevatedButton(                     //Normaler Button, um nächstes Wort zu generieren
-                  onPressed: () {                   //Wenn Button gedrückt
-                   appState.getNext();              //Neues Wort generieren durch getNext()
-                  },
-                child: Text('Next'),                //Button Text
-                ),
-              ]
-            ),*/
+            /*return ListView(                                //eine Spalte, die man scrollen kann
+                children: [
+                  for (var pair in appState.favorites)
+                    ListTile(
+                      leading: Icon(Icons.favorite),
+                      title: Text(pair.asLowerCase),
+                    ),
+                  void onNoteSelected(File file) {
+                    openAndEditFile(context, file);
+                  }  
+                ],
+              );*/
+
+            Text('Notizen', style: Theme.of(context).textTheme.displayMedium),
+            Text('Hier werden deine Notizen angezeigt'),
           ],  //children
         ),
       );
   }
 }
 
-/*class BigCard extends StatelessWidget {             //Widget BigCard, gibt Wortpaar aus
-  const BigCard({
-    super.key,
-    required this.pair,
-  });
+void openAndEditFile(BuildContext context, File file) {
+  Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': file});
+}
 
-  final WordPair pair;
-
+class NotizBearbeiten extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);                  //Pointer zu Theme der App (in MyApp festgelegt)
-    var style = theme.textTheme.displayMedium!.copyWith(
-      color: theme.colorScheme.onPrimary);          //Schriftart/-farbe der Karte
+    var args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    var file = args['file'] as File;
+    var text = file.readAsStringSync();
 
-    return Card(
-      color: theme.colorScheme.primary,             //Farbe der Karte, festgelegt in MyApp
-      child: Padding(
-        padding: const EdgeInsets.all(15),          //Außenabstand der Karte
-        child: Text(pair.asLowerCase,               //Karte mit Wort füllen
-        style: style,                               //Textfarbe/-schrift
-        semanticsLabel: pair.asPascalCase,),        //Für Screenreader gedacht                   
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Notiz bearbeiten'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: TextField(
+          controller: TextEditingController(text: text),
+          maxLines: null,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+          ),
+        ),
       ),
     );
- */
+  }
+}
 
-class CategoriesPage extends StatelessWidget {
+/*class NeueNotiz extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
 
-    if (appState.favorites.isEmpty) {
-      return Center(
-        child: Text('No favorites yet.'),
-      );
-    }
+    return Center(                                 //Zentrieren des Widgets (waagerechte)
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,  //Zentrieren der Spalte (senkrechte)
 
-    return ListView(                                //eine Spalte, die man scrollen kann
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Text('You have '
-              '${appState.favorites.length} favorites:'), //Anzahl der Favoriten
+          children: [
+            Text('Neue Notizen hier hin', style: Theme.of(context).textTheme.displayMedium),
+            Text('Hier sollen neue Notizen erstellt werden können, die dann in der Notizen Seite angezeigt werden'),
+          ],  //children
         ),
-        for (var pair in appState.favorites)
-          ListTile(
-            leading: Icon(Icons.favorite),
-            title: Text(pair.asLowerCase),
+      );
+    
+  }
+}*/
+
+class NeueNotiz extends StatefulWidget {
+  @override
+  State<NeueNotiz> createState() => _NeueNotizState();
+}
+
+class _NeueNotizState extends State<NeueNotiz> {
+  final _formKey = GlobalKey<FormState>(); // Key für Formulareingaben
+  final TextEditingController _nameController = TextEditingController();
+  
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {  // Wenn alle Formulareingaben gültig sind
+      final name = _nameController.text;
+      if (name.isNotEmpty) { // Wenn ein Name für die Notiz eingegeben wurde
+        // Datei mit dem eingegebenen Namen erstellen
+        var appState = context.watch<MyAppState>();
+        final file = File('${appState.appDocumentsDir.path}/$name.txt');
+        file.createSync();
+
+        // Neue Datei öffnen und bearbeiten
+        openAndEditFile(context, file);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Form(
+            key: _formKey,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: TextFormField(
+                controller: _nameController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Sie müssen einen gültigen Namen vergeben!';
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                  hintText: 'Name der Notiz:',
+                  labelText: 'Notizname',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
           ),
-      ],
+          SizedBox(height: 20.0),
+          ElevatedButton(
+            onPressed: _submitForm,
+            child: Text('Erstellen'),
+          ),
+        ],
+      ),
     );
+  }
+}
+
+
+class Settings extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
+    return Center(                                 //Zentrieren des Widgets (waagerechte)
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,  //Zentrieren der Spalte (senkrechte)
+
+          children: [
+            Text('Einstellungen', style: Theme.of(context).textTheme.displayMedium),
+            Text('Hier werden deine Notizen angezeigt'),
+          ],  //children
+        ),
+      );
+    
   }
 }
