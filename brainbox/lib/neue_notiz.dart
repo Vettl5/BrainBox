@@ -10,29 +10,24 @@ import 'main.dart';
 import 'notizen_bearbeiten.dart';
 
 class NeueNotiz extends StatefulWidget {
-  const NeueNotiz({super.key});
+  const NeueNotiz({super.key});                                   //Konstruktor für NeueNotiz
   @override
-  State<NeueNotiz> createState() => _NeueNotizState();
+  State<NeueNotiz> createState() => _NeueNotizState();            //State für NeueNotiz wird erstellt
 }
 
-class _NeueNotizState extends State<NeueNotiz> {                  //Neue Notiz, die in einem String gespeichert werden soll und benannt werden kann
-  var appState;
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    appState = context.read<MyAppState>();
-  }
+class _NeueNotizState extends State<NeueNotiz> {                  //State Klasse für NeueNotiz; Private Klasse, da nur in NeueNotiz verwendet
+  final _formKey = GlobalKey<FormState>();                        //GlobalKey für Formular, um Eingabe zu überprüfen, durch validator (s.u.)
+  final TextEditingController _nameController = TextEditingController();      //Controller für Eingabe des Namens der Notiz
+  late MyAppState appState;                                       //Variable appState mit Klasse MyAppState linken
 
   void _submitForm() {                                            //Funktion, die die Notiz erstellt, speichert und öffnen veranlasst
   if (_formKey.currentState!.validate()) {                        //Wenn Eingabe valide, dann Datei generieren, sonst siehe validator (s.u.)
     final name = _nameController.text;
     if (name.isNotEmpty) {
-      final newFilePath = appState.appDocumentsDir.path + '/' + name + '.txt';
-      final newFile = File(newFilePath);
-      openAndEditFile(context, newFile);
+      final notiz = Notiz(name: name);                            //Erstellt Notiz mit eingegebenem Namen
+      appState.addNotiz(notiz);                                   //Fügt Notiz zu Liste hinzu
+      Navigator.pop(context);                                     //Schließt aktuelle Seite
+      Navigator.pushNamed(context, '/bearbeiten', arguments: notiz);  //Öffnet NotizBearbeiten() mit der erstellten Notiz
     }
   }
 }
