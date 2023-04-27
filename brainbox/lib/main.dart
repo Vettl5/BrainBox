@@ -48,7 +48,6 @@ class GetApplicationDocumentsDirectory extends StatelessWidget {
     return Directory(path);
   }
 }
-}
 
 class MyAppState extends ChangeNotifier {
   List<String> notizen = [];  // Liste der Notizen wird initialisiert
