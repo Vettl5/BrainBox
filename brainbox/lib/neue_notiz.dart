@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 //Dateien:
+import 'main.dart';
 import 'notizen_bearbeiten.dart';
 //---------------------------------------------------------------------------------------------------------------
 
@@ -22,8 +23,8 @@ class _NeueNotizState extends State<NeueNotiz> {                              //
   Future<Directory?>? _appDocumentsDirectory;
   final _formKey = GlobalKey<FormState>();                                    //GlobalKey für Formular, um Eingabe zu überprüfen, durch validator (s.u.)
   final TextEditingController _nameController = TextEditingController();      //Controller für Eingabe des Namens der Notiz
-  //final _platform = Platform();                                               // Plattform wird initialisiert, um Pfad zu bekommen
-  List<String> notizen = [];                                                  // Liste der Notizen wird initialisiert, soll Namen speichern
+  late MyAppState appState;
+  
   
   void _submitForm() {                                                        //Funktion, die die Notiz erstellt, speichert und öffnen veranlasst
     if (_formKey.currentState!.validate()) {                                  //Wenn Eingabe valide, dann Datei generieren, sonst siehe validator (s.u.)
@@ -45,7 +46,7 @@ class _NeueNotizState extends State<NeueNotiz> {                              //
     _requestAppDocumentsDirectory();
     final newFilePath = '$_appDocumentsDirectory/$name.txt';                          // Pfad der neuen .txt-Datei
     final newFile = File(newFilePath);                                                // neue .txt-Datei wird erstellt
-    notizen.add(name);                                                                // Notizname zur Liste der Notizen hinzufügen
+    appState.notizen.add(name);                                                       // Notizname zur Liste der Notizen hinzufügen
     openAndEditFile(context, newFile);                                                // Notiz als .txt-Datei speichern
     }
 
@@ -53,7 +54,7 @@ class _NeueNotizState extends State<NeueNotiz> {                              //
     final filePath = '$getApplicationDocumentsDirectory/$name.txt';
     final file = File(filePath);
     file.deleteSync();                                                                // .txt-Datei aus Pfad löschen
-    notizen.remove(name);                                                             // Notizname aus Liste der Notizen entfernen
+    appState.notizen.remove(name);                                                             // Notizname aus Liste der Notizen entfernen
   }
 
   @override

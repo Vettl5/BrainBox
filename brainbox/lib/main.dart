@@ -1,12 +1,15 @@
 //import 'dart:io';
 //import 'package:path/path.dart' as p;
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:path_provider/path_provider.dart';
 //import 'package:path_provider/path_provider.dart';
 
 import 'neue_notiz.dart';
 import 'notizen_bearbeiten.dart';
-//import 'notizen_uebersicht.dart';
+import 'notizen_uebersicht.dart';
 //import 'settings.dart';
 
 void main() {
@@ -37,36 +40,11 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 
 class MyAppState extends ChangeNotifier {
-  
-
-  //Alte Version
-  /*String name = '';                                     //Variable name mit Wert '' (leerer String) wird erstellt
-  String text = '';                                     //Variable text mit Wert [] (leere Liste) wird erstellt
-
-  notiz (String name, String text){                     //Funktion notiz mit Parameter name und text wird erstellt
-    this.name = name;
-    this.text = text;
-  }                                                     //Variable notiz mit Wert [] (leere Liste) wird erstellt
-
-  void addNotiz(notiz) {                                              //Funktion addNotiz mit Parameter notiz wird erstellt
-    notiz.add(notiz);                                                 //notiz wird der Liste notiz hinzugefügt
-    notifyListeners();                                                //Änderung wird an alle Widgets weitergegeben
-  }
-
-  void removeNotiz(notiz) {                                           //Funktion removeNotiz mit Parameter notiz wird erstellt
-    notiz.remove(notiz);                                              //notiz wird aus der Liste notiz entfernt
-    notifyListeners();                                                //Änderung wird an alle Widgets weitergegeben
-  }*/
-
-  /*Directory? _appDocumentsDir;                                        //Variable appDocumentsDir mit Klasse Directory linken
-  Directory? get appDocumentsDir => _appDocumentsDir;                   //Getter für appDocumentsDir
-
-  void setAppDocumentsDir(Directory dir) {                              //Setter für appDocumentsDir
-    _appDocumentsDir = dir;                                             //appDocumentsDir wird mit dir verlinkt
-    notifyListeners();                                                  //Änderung wird an alle Widgets weitergegeben
-  }*/
+  List<String> notizen = [];                                       // Liste der Notizen wird initialisiert, soll Namen speichern
   
 }
+
+
  
 
 class MyHomePage extends StatefulWidget {                           //Widget von MyHomePage (quasi gesamter Bildschirm)
@@ -85,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
     Widget page;
     switch (selectedIndex) {
     case 0:
-      page = Placeholder();                           //Notizenübersicht, Startseite
+      page = Notizen();                           //Notizenübersicht, Startseite
       break;
     case 1:
       page = NeueNotiz();                         //Neue Notiz anlegen und anschließend öffnen
@@ -137,3 +115,34 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
     );
   }
 }
+
+
+
+
+
+  //Alte Version
+  /*String name = '';                                     //Variable name mit Wert '' (leerer String) wird erstellt
+  String text = '';                                     //Variable text mit Wert [] (leere Liste) wird erstellt
+
+  notiz (String name, String text){                     //Funktion notiz mit Parameter name und text wird erstellt
+    this.name = name;
+    this.text = text;
+  }                                                     //Variable notiz mit Wert [] (leere Liste) wird erstellt
+
+  void addNotiz(notiz) {                                              //Funktion addNotiz mit Parameter notiz wird erstellt
+    notiz.add(notiz);                                                 //notiz wird der Liste notiz hinzugefügt
+    notifyListeners();                                                //Änderung wird an alle Widgets weitergegeben
+  }
+
+  void removeNotiz(notiz) {                                           //Funktion removeNotiz mit Parameter notiz wird erstellt
+    notiz.remove(notiz);                                              //notiz wird aus der Liste notiz entfernt
+    notifyListeners();                                                //Änderung wird an alle Widgets weitergegeben
+  }*/
+
+  /*Directory? _appDocumentsDir;                                        //Variable appDocumentsDir mit Klasse Directory linken
+  Directory? get appDocumentsDir => _appDocumentsDir;                   //Getter für appDocumentsDir
+
+  void setAppDocumentsDir(Directory dir) {                              //Setter für appDocumentsDir
+    _appDocumentsDir = dir;                                             //appDocumentsDir wird mit dir verlinkt
+    notifyListeners();                                                  //Änderung wird an alle Widgets weitergegeben
+  }*/
