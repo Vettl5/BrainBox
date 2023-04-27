@@ -1,12 +1,12 @@
-import 'dart:io';
+//import 'dart:io';
 //import 'package:path/path.dart' as p;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
+//import 'package:path_provider/path_provider.dart';
 
 import 'neue_notiz.dart';
 import 'notizen_bearbeiten.dart';
-import 'notizen_uebersicht.dart';
+//import 'notizen_uebersicht.dart';
 //import 'settings.dart';
 
 void main() {
@@ -14,7 +14,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {                             //Definiert einige Randdetails der App
-  const MyApp({super.key});
+  const MyApp({super.key});                                       //Konstruktor für MyApp
 
   @override
   Widget build(BuildContext context) {
@@ -37,19 +37,9 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 
 class MyAppState extends ChangeNotifier {
-  List<String> notizen = [];  // Liste der Notizen wird initialisiert, soll Namen speichern
-  final _platform = Platform(); // Plattform wird initialisiert, um Pfad zu bekommen
-
-  Future<Directory> getApplicationDocumentsDirectory() async {
-    final String? path = await _platform.getApplicationDocumentsDirectory();
-    if (path == null) {
-      throw MissingPlatformDirectoryException(
-        'Unable to get application documents directory');
-    }
-    return Directory(path);
-  }
-
   
+
+  //Alte Version
   /*String name = '';                                     //Variable name mit Wert '' (leerer String) wird erstellt
   String text = '';                                     //Variable text mit Wert [] (leere Liste) wird erstellt
 
@@ -95,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
     Widget page;
     switch (selectedIndex) {
     case 0:
-      page = Notizen();                           //Notizenübersicht, Startseite
+      page = Placeholder();                           //Notizenübersicht, Startseite
       break;
     case 1:
       page = NeueNotiz();                         //Neue Notiz anlegen und anschließend öffnen

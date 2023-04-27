@@ -19,9 +19,10 @@ class NeueNotiz extends StatefulWidget {
 }
 
 class _NeueNotizState extends State<NeueNotiz> {                              //State Klasse für NeueNotiz; Private Klasse, da nur in NeueNotiz verwendet
+  Future<Directory?>? _appDocumentsDirectory;
   final _formKey = GlobalKey<FormState>();                                    //GlobalKey für Formular, um Eingabe zu überprüfen, durch validator (s.u.)
   final TextEditingController _nameController = TextEditingController();      //Controller für Eingabe des Namens der Notiz
-  final _platform = Platform();                                               // Plattform wird initialisiert, um Pfad zu bekommen
+  //final _platform = Platform();                                               // Plattform wird initialisiert, um Pfad zu bekommen
   List<String> notizen = [];                                                  // Liste der Notizen wird initialisiert, soll Namen speichern
   
   void _submitForm() {                                                        //Funktion, die die Notiz erstellt, speichert und öffnen veranlasst
@@ -29,33 +30,27 @@ class _NeueNotizState extends State<NeueNotiz> {                              //
       final name = _nameController.text;
       if (name.isNotEmpty) {
         addNotiz(name);                                                      //Übergibt Namen der Notiz an addNotiz() in main.dart
-        
-        //Sollte lieber in main.dart passieren, da dort auch die Liste der Notizen verwaltet wird
-        /*Navigator.pop(context);                                     //Schließt aktuelle Seite
-        Navigator.pushNamed(context, '/bearbeiten', arguments: notiz);  //Öffnet NotizBearbeiten() mit der erstellten Notiz*/
       }
     }
   }
 
-  Future<Directory> getApplicationDocumentsDirectory() async {
-    final String? path = await _platform.getApplicationDocumentsDirectory();
-    if (path == null) {
-      throw MissingPlatformDirectoryException(
-        'Unable to get application documents directory');
-    }
-    return Directory(path);
+  void _requestAppDocumentsDirectory() {
+    setState(() {
+      _appDocumentsDirectory = getApplicationDocumentsDirectory();
+    });
+
   }
 
-
   void addNotiz(String name) {
-    final newFilePath = '$getApplicationDocumentsDirectory.path/$name.txt';           // Pfad der neuen .txt-Datei
+    _requestAppDocumentsDirectory();
+    final newFilePath = '$_appDocumentsDirectory/$name.txt';                          // Pfad der neuen .txt-Datei
     final newFile = File(newFilePath);                                                // neue .txt-Datei wird erstellt
     notizen.add(name);                                                                // Notizname zur Liste der Notizen hinzufügen
     openAndEditFile(context, newFile);                                                // Notiz als .txt-Datei speichern
     }
 
   void removeNotiz(String name) {
-    final filePath = '$getApplicationDocumentsDirectory.path/$name.txt';
+    final filePath = '$getApplicationDocumentsDirectory/$name.txt';
     final file = File(filePath);
     file.deleteSync();                                                                // .txt-Datei aus Pfad löschen
     notizen.remove(name);                                                             // Notizname aus Liste der Notizen entfernen
@@ -97,3 +92,18 @@ class _NeueNotizState extends State<NeueNotiz> {                              //
     ); //Center
   } //Widget build
 } //NeueNotizState
+
+
+        
+        //Sollte lieber in main.dart passieren, da dort auch die Liste der Notizen verwaltet wird
+        /*Navigator.pop(context);                                     //Schließt aktuelle Seite
+        Navigator.pushNamed(context, '/bearbeiten', arguments: notiz);  //Öffnet NotizBearbeiten() mit der erstellten Notiz*/
+
+/*Future<Directory> getApplicationDocumentsDirectory() async {
+    final String? path = await _platform.getApplicationDocumentsDirectory();
+        if (path == null) {
+      throw MissingPlatformDirectoryException(
+        'Unable to get application documents directory');
+    }
+    return Directory(path);
+  }*/
