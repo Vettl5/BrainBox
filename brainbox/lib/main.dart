@@ -1,16 +1,15 @@
 //import 'dart:io';
-//import 'package:path/path.dart' as p;
-import 'dart:io';
-
+//import 'package:path/path.dart';
+//import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
-//import 'package:path_provider/path_provider.dart';
 
 import 'neue_notiz.dart';
 import 'notizen_bearbeiten.dart';
 import 'notizen_uebersicht.dart';
-//import 'settings.dart';
+//import 'einstellungen.dart';
+
+/*----------------------------------------------------------------------------------------------------------*/
 
 void main() {
   runApp(MyApp());
