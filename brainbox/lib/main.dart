@@ -1,8 +1,8 @@
-//import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+//import 'package:path/path.dart' as p;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'neue_notiz.dart';
 import 'notizen_bearbeiten.dart';
@@ -36,45 +36,19 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 }
 
 
-class GetApplicationDocumentsDirectory extends StatelessWidget {
-  const getApplicationDocumentsDirectory({Key? key}) : super(key: key);
+class MyAppState extends ChangeNotifier {
+  List<String> notizen = [];  // Liste der Notizen wird initialisiert, soll Namen speichern
+  final _platform = Platform(); // Plattform wird initialisiert, um Pfad zu bekommen
 
   Future<Directory> getApplicationDocumentsDirectory() async {
-    final String? path = await _platform.getApplicationDocumentsPath();
+    final String? path = await _platform.getApplicationDocumentsDirectory();
     if (path == null) {
       throw MissingPlatformDirectoryException(
         'Unable to get application documents directory');
     }
     return Directory(path);
   }
-}
 
-class MyAppState extends ChangeNotifier {
-  List<String> notizen = [];  // Liste der Notizen wird initialisiert
-  String path = '/data/user/0/com.example.brainbox/app_flutter';  // Pfad zum App-Dokumente-Verzeichnis
-  String appDocumentsPath = initAppDocumentsDir();    // Pfad zum App-Dokumente-Verzeichnis
-
-  
-
-  Future<void> notiz(String name, String text) async {
-    final newFilePath = '$appDocumentsPath/$name.txt';
-    final newFile = File(newFilePath);
-    await newFile.writeAsString(text);
-  }
-
-  void addNotiz(String name, String text) {
-    notiz(name, text);          // Notiz als .txt-Datei speichern
-    notizen.add(name);          // Notizname zur Liste der Notizen hinzufügen
-    notifyListeners();          // Änderung wird an alle Widgets weitergegeben
-  }
-
-  void removeNotiz(String name) {
-    final filePath = '$appDocumentsPath/$name.txt';
-    final file = File(filePath);
-    file.deleteSync();          // .txt-Datei aus Pfad löschen
-    notizen.remove(name);       // Notizname aus Liste der Notizen entfernen
-    notifyListeners();          // Änderung wird an alle Widgets weitergegeben
-  }
   
   /*String name = '';                                     //Variable name mit Wert '' (leerer String) wird erstellt
   String text = '';                                     //Variable text mit Wert [] (leere Liste) wird erstellt
