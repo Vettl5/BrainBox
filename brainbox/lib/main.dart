@@ -77,7 +77,50 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
     return Scaffold(
       body: Column(
         children: [
-          SafeArea(                                 //oberes Widget, Page (s.o.) (SafeArea bewirkt Barrierefreiheit ggü. Notch etc.)
+          Expanded(
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: page,
+            ),
+          ),
+        ],
+      ),
+      //Noch nicht perfekt, aber BottomNavigationBar rutscht nicht nach unten weg. Container ist momentan nur so breit wie Text lang ist
+      bottomNavigationBar: BottomAppBar(
+        child: BottomNavigationBar(
+          backgroundColor: Colors.white,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.menu),
+              label: 'Notizen',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add_circle_outline),
+              label: 'Neue Notiz',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+          currentIndex: selectedIndex,       
+          onTap: (value) {                     
+            setState(() {                     
+              selectedIndex = value;                          //selectedIndex wird auf den Wert von value gesetzt, entsprechende page im nächsten reload     
+              print(value);                                   //Ausgabe des Wertes von value in der Konsole, nur zur Kontrolle                   
+              }
+            );                                
+          },
+        ),
+      ),
+    );
+  }
+}
+
+
+/*body: Column(
+        children: [
+          Expanded(                                 //oberes Widget, Page (s.o.) (SafeArea bewirkt Barrierefreiheit ggü. Notch etc.)
             child: Container(
               color: Theme.of(context).colorScheme.primaryContainer,
               child: page,                          //Variable page aufrufen als Inhalt; basierend auf selectedIndex wird die entsprechende Seite aufgerufen
@@ -100,23 +143,11 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
                   label: 'Settings',
                 ),
               ],
-              currentIndex: selectedIndex,       
-              onTap: (value) {                     
-                setState(() {                     
-                  selectedIndex = value;                          //selectedIndex wird auf den Wert von value gesetzt, entsprechende page im nächsten reload     
-                  print(value);                                   //Ausgabe des Wertes von value in der Konsole, nur zur Kontrolle                   
-                });                                
-              },
+              
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-
-
+      ),*/
 
 
   //Alte Version
