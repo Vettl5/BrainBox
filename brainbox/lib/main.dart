@@ -1,29 +1,34 @@
-import 'dart:io';
+//import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:english_words/english_words.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'neue_notiz.dart';
+import 'notizen_bearbeiten.dart';
+import 'notizen_uebersicht.dart';
+//import 'settings.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget { //Definiert einige Randdetails der App
+class MyApp extends StatelessWidget {                             //Definiert einige Randdetails der App
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
+    return ChangeNotifierProvider(                                //ein Widget, das die Daten an alle Widgets weitergibt
+      create: (context) => MyAppState(),                          //erstellt eine Instanz von MyAppState
       child: MaterialApp(
         title: 'BrainBox',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 92, 124, 182)),
         ),
-        home: MyHomePage(),
+        home: MyHomePage(),                                       //Startseite der App, leitet durch selectedIndex=0 zu Notizen() weiter
         routes: {
-          '/bearbeiten': (context) => NotizBearbeiten(),
+          '/bearbeiten': (context) => NotizBearbeiten(),          //leitet zu NotizBearbeiten() weiter, wichtig für neue_notiz (Navigator.pushNamed...)
         },
       ),
     );
@@ -31,22 +36,85 @@ class MyApp extends StatelessWidget { //Definiert einige Randdetails der App
 }
 
 
-class MyAppState extends ChangeNotifier {
+class GetApplicationDocumentsDirectory extends StatelessWidget {
+  const getApplicationDocumentsDirectory({Key? key}) : super(key: key);
 
+  Future<Directory> getApplicationDocumentsDirectory() async {
+    final String? path = await _platform.getApplicationDocumentsPath();
+    if (path == null) {
+      throw MissingPlatformDirectoryException(
+        'Unable to get application documents directory');
+    }
+    return Directory(path);
+  }
+}
+}
+
+class MyAppState extends ChangeNotifier {
+  List<String> notizen = [];  // Liste der Notizen wird initialisiert
+  String path = '/data/user/0/com.example.brainbox/app_flutter';  // Pfad zum App-Dokumente-Verzeichnis
+  String appDocumentsPath = initAppDocumentsDir();    // Pfad zum App-Dokumente-Verzeichnis
+
+  
+
+  Future<void> notiz(String name, String text) async {
+    final newFilePath = '$appDocumentsPath/$name.txt';
+    final newFile = File(newFilePath);
+    await newFile.writeAsString(text);
+  }
+
+  void addNotiz(String name, String text) {
+    notiz(name, text);          // Notiz als .txt-Datei speichern
+    notizen.add(name);          // Notizname zur Liste der Notizen hinzufügen
+    notifyListeners();          // Änderung wird an alle Widgets weitergegeben
+  }
+
+  void removeNotiz(String name) {
+    final filePath = '$appDocumentsPath/$name.txt';
+    final file = File(filePath);
+    file.deleteSync();          // .txt-Datei aus Pfad löschen
+    notizen.remove(name);       // Notizname aus Liste der Notizen entfernen
+    notifyListeners();          // Änderung wird an alle Widgets weitergegeben
+  }
+  
+  /*String name = '';                                     //Variable name mit Wert '' (leerer String) wird erstellt
+  String text = '';                                     //Variable text mit Wert [] (leere Liste) wird erstellt
+
+  notiz (String name, String text){                     //Funktion notiz mit Parameter name und text wird erstellt
+    this.name = name;
+    this.text = text;
+  }                                                     //Variable notiz mit Wert [] (leere Liste) wird erstellt
+
+  void addNotiz(notiz) {                                              //Funktion addNotiz mit Parameter notiz wird erstellt
+    notiz.add(notiz);                                                 //notiz wird der Liste notiz hinzugefügt
+    notifyListeners();                                                //Änderung wird an alle Widgets weitergegeben
+  }
+
+  void removeNotiz(notiz) {                                           //Funktion removeNotiz mit Parameter notiz wird erstellt
+    notiz.remove(notiz);                                              //notiz wird aus der Liste notiz entfernt
+    notifyListeners();                                                //Änderung wird an alle Widgets weitergegeben
+  }*/
+
+  /*Directory? _appDocumentsDir;                                        //Variable appDocumentsDir mit Klasse Directory linken
+  Directory? get appDocumentsDir => _appDocumentsDir;                   //Getter für appDocumentsDir
+
+  void setAppDocumentsDir(Directory dir) {                              //Setter für appDocumentsDir
+    _appDocumentsDir = dir;                                             //appDocumentsDir wird mit dir verlinkt
+    notifyListeners();                                                  //Änderung wird an alle Widgets weitergegeben
+  }*/
   
 }
  
 
-
-class MyHomePage extends StatefulWidget {         //Widget von MyHomePage (quasi gesamter Bildschirm)
-  const MyHomePage({super.key});
+class MyHomePage extends StatefulWidget {                           //Widget von MyHomePage (quasi gesamter Bildschirm)
+  const MyHomePage({super.key});                                    //Konstruktor für MyHomePage
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState();            //State für MyHomePage wird erstellt
 }
 
-class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHomePage; Private Klasse, da nur in MyHomePage verwendet
+class _MyHomePageState extends State<MyHomePage> {                  //State Klasse für MyHomePage; Private Klasse, da nur in MyHomePage verwendet
   
-  var selectedIndex = 0;
+  var selectedIndex = 0;                          //Variable selectedIndex mit Wert 0 (Startseite) wird erstellt
   
   @override
   Widget build(BuildContext context) {
@@ -54,40 +122,40 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
     Widget page;
     switch (selectedIndex) {
     case 0:
-      page = Notizen();                           //wird Notizen Seite, noch ungenutzt
+      page = Notizen();                           //Notizenübersicht, Startseite
       break;
     case 1:
-      page = NeueNotiz();                         //wird Generator Seite, noch ungenutzt
+      page = NeueNotiz();                         //Neue Notiz anlegen und anschließend öffnen
       break;
     case 2:
       page = Placeholder();                       //wird Einstellungen Seite, noch ungenutzt
       break;
     default:
-      throw UnimplementedError('no widget for $selectedIndex');
+      throw UnimplementedError('no widget for $selectedIndex');       //Just in case
     }
 
     return Scaffold(
       body: Column(
         children: [
-          SafeArea(                                 //Widget rechte Seite, Generator Page (Expanded gibt Widget so viel Platz wie möglich)
+          SafeArea(                                 //oberes Widget, Page (s.o.) (SafeArea bewirkt Barrierefreiheit ggü. Notch etc.)
             child: Container(
               color: Theme.of(context).colorScheme.primaryContainer,
-              child: page,                          //Variable page aufrufen als Inhalt; based on selectedIndex wird die entsprechende Seite aufgerufen
+              child: page,                          //Variable page aufrufen als Inhalt; basierend auf selectedIndex wird die entsprechende Seite aufgerufen
             ),
           ),
-          BottomAppBar(                             //Widget untere Seite, BottomAppBar mit BottomNavigationBar
+          BottomAppBar(                             //Untere Leiste, BottomAppBar mit BottomNavigationBar Buttons
             child: BottomNavigationBar(
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.white,                    //Hintergrundfarbe    
               items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
+                BottomNavigationBarItem(                          //Notizenübesicht, Startseite
                   icon: Icon(Icons.menu),         
                   label: 'Notizen',
                 ),
-                BottomNavigationBarItem(
+                BottomNavigationBarItem(                          //Neue Notiz anlegen
                   icon: Icon(Icons.add_circle_outline),     
                   label: 'Neue Notiz',
                 ),
-                BottomNavigationBarItem(
+                BottomNavigationBarItem(                          //Einstellungen
                   icon: Icon(Icons.settings),     
                   label: 'Settings',
                 ),
@@ -95,8 +163,8 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
               currentIndex: selectedIndex,       
               onTap: (value) {                     
                 setState(() {                     
-                  selectedIndex = value;          
-                  print(value);                   
+                  selectedIndex = value;                          //selectedIndex wird auf den Wert von value gesetzt, entsprechende page im nächsten reload     
+                  print(value);                                   //Ausgabe des Wertes von value in der Konsole, nur zur Kontrolle                   
                 });                                
               },
             ),
@@ -106,149 +174,3 @@ class _MyHomePageState extends State<MyHomePage> {      //State Klasse für MyHo
     );
   }
 }
-
-
-class Notizen extends StatelessWidget {
-  const Notizen({super.key});
-  @override
-  Widget build(BuildContext context) {                              //Zu jedem Widget gehört eine Build Funktion
-    var appState = context.watch<MyAppState>();                     //Variable appState mit Klasse MyAppState linken
-    //Directory appDocumentsDir = appState.appDocumentsDir;
-
-    return ListView(                                        //eine Spalte, die man scrollen kann
-      padding: EdgeInsets.all(16.0),                                // Innenabstand von 16 Pixeln auf allen Seiten
-      shrinkWrap: true,                                             // Passt die Größe des Widgets an den Inhalt an
-      physics: BouncingScrollPhysics(),                             // Ein physikalisches Scrollverhalten, das abprallt
-      children: [
-        
-      ],
-    );
-  }
-}
-
-
-void openAndEditFile(BuildContext context, File file) {
-  Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': file});
-}
-
-
-class NotizBearbeiten extends StatelessWidget {
-  const NotizBearbeiten({super.key});
-  @override
-  Widget build(BuildContext context) {
-    var args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    var file = args['file'] as File;
-    var text = file.readAsStringSync();
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Notiz bearbeiten'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: TextField(
-          controller: TextEditingController(text: text),
-          maxLines: null,
-          decoration: InputDecoration(
-            border: InputBorder.none,
-          ),
-        ),
-      ),
-      /*Text('Notiz bearbeiten', style: Theme.of(context).textTheme.displayMedium),
-      Text('Hier werden deine Notizen angezeigt'),*/
-    );
-  }
-}
-
-
-class NeueNotiz extends StatefulWidget {
-  const NeueNotiz({super.key});
-  @override
-  State<NeueNotiz> createState() => _NeueNotizState();
-}
-
-class _NeueNotizState extends State<NeueNotiz> {                  //Neue Notiz, die in einem String gespeichert werden soll und benannt werden kann
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    appState = context.read<MyAppState>();
-  }
-
-  void _submitForm() {                                            //Funktion, die die Notiz erstellt, speichert und öffnen veranlasst
-  if (_formKey.currentState!.validate()) {                        //Wenn Eingabe valide, dann Datei generieren, sonst siehe validator (s.u.)
-    final name = _nameController.text;
-    if (name.isNotEmpty) {
-      final newFilePath = appState.appDocumentsDir.path + '/' + name + '.txt';
-      final newFile = File(newFilePath);
-      openAndEditFile(context, newFile);
-    }
-  }
-}
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Form(                                                             //Eingabeformular Feld
-            key: _formKey,                                                  //Debugging Key für aktuelles Formular, macht Eingabe überprüfbar/zuweisbar
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: TextFormField(                                         //Textfeld, in dem der Name der Notiz eingegeben werden kann
-                controller: _nameController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {                     //validator prüft, ob Eingabe ungültig ist
-                    return 'Sie müssen einen gültigen Namen vergeben!';
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  hintText: 'Name der Notiz:',
-                  labelText: 'Notizname',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 20.0),                                           //Abstandshalter zwischen Textfeld und Button
-          ElevatedButton(
-            onPressed: _submitForm,                                         //Gültigkeit der Eingabe wird geprüft
-            child: Text('Erstellen'),
-          ),  //ElevatedButton
-        ],  //children
-      ),  //Column
-    ); //Center
-  } //Widget build
-} //_NeueNotizState
-
-
-/*class Settings extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-
-    return Center(                                 //Zentrieren des Widgets (waagerechte)
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,  //Zentrieren der Spalte (senkrechte)
-
-          children: [
-            Text('Einstellungen', style: Theme.of(context).textTheme.displayMedium),
-            Text('Hier werden deine Notizen angezeigt'),
-          ],  //children
-        ),
-      );
-    
-  }
-}*/
