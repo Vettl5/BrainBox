@@ -88,11 +88,61 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
       throw UnimplementedError('no widget for $selectedIndex');       //Just in case
     }
 
+    var mainArea = ColoredBox(
+      color: Theme.of(context).colorScheme.primary,
+      child: Container(
+        color: Theme.of(context).colorScheme.primaryContainer,
+        child: page,
+      ),
+    );
+
     return Scaffold(
-      body: Column(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Column(
+            children: [
+              Expanded(child: mainArea),
+              SafeArea(
+                child: BottomAppBar(
+                  child: BottomNavigationBar(                     //error-causing widget
+                    //backgroundColor: Colors.white,
+                    items: const <BottomNavigationBarItem>[
+                      BottomNavigationBarItem(                          //Notizenübesicht, Startseite
+                        icon: Icon(Icons.menu),         
+                        label: 'Notizen',
+                      ),
+                      BottomNavigationBarItem(                          //Neue Notiz anlegen
+                        icon: Icon(Icons.add_circle_outline),     
+                        label: 'Neue Notiz',
+                      ),
+                      BottomNavigationBarItem(                          //Einstellungen
+                        icon: Icon(Icons.settings),     
+                        label: 'Settings',
+                      ),
+                    ],
+                    currentIndex: selectedIndex,       
+                    onTap: (value) {                     
+                      setState(() {                     
+                        selectedIndex = value;                          //selectedIndex wird auf den Wert von value gesetzt, entsprechende page im nächsten reload     
+                        print(value);                                   //Ausgabe des Wertes von value in der Konsole, nur zur Kontrolle                   
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+      /*body: Column(
         children: [
-          Expanded(
-            child: page,
+          SafeArea(
+            child: Container(
+              ,
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: page,
+            ), 
+            page,
           ),
           
           
@@ -125,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
             ),
           ),
         ],
-      ),
+      ),*/
     );
   }
 }

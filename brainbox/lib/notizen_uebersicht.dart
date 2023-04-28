@@ -18,42 +18,44 @@ class Notizen extends StatefulWidget {
 
 
 class _NotizenState extends State<Notizen> {
-  //late final MyAppState appState;
-  var appState =  MyAppState();
+  //var appState =  MyAppState();
 
- /* @override
+  @override
+  Widget build(BuildContext context) {   
+    var appState = MyAppState();
+    return buildNotizenListe(appState);                                     
+  }
+
+  Widget buildNotizenListe(MyAppState appState) {
+    return Center(
+      child: appState.notizen.isEmpty
+          ? Text('Du hast noch keine Notizen erstellt.')
+          : ListView(
+              padding: const EdgeInsets.all(40),
+              shrinkWrap: true,
+              physics: BouncingScrollPhysics(),
+              children: [
+                for (var notiz in appState.notizen)
+                  ListTile(
+                    title: Text(notiz),
+                    onTap: () {
+                      openAndEditFile(context, File(notiz));
+                      Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': File(notiz)});
+                    },
+                  ),
+              ],
+            ),
+    );
+  }
+}
+
+/* @override
   void initState() {
     super.initState();
     appState = MyAppState();
   }*/
 
-  @override
-  Widget build(BuildContext context) {   
-    return buildNotizenListe();                                     
-  }
-
-  Widget buildNotizenListe() {
-
-    
-    if (appState.notizen.isEmpty) {
-      return Text('Du hast noch keine Notizen erstellt.');
-    } else {
-      return ListView(
-      padding: EdgeInsets.all(16.0),
-      shrinkWrap: true,
-      physics: BouncingScrollPhysics(),
-      children: [
-        for (var notiz in appState.notizen)
-          ListTile(
-            title: Text(notiz),
-            onTap: () {
-              openAndEditFile(context, File(notiz));
-              Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': File(notiz)});
-            },
-          ),
-      ],
-    );
-      /*return ListView.builder(
+/*return ListView.builder(
         shrinkWrap: true,
         physics: BouncingScrollPhysics(),
         itemCount: appState.notizen.length,
@@ -64,8 +66,4 @@ class _NotizenState extends State<Notizen> {
               openAndEditFile(context, File(appState.notizen[index]));
             },
           );
-        },
-      );*/
-    }
-  }
-}
+        },*/
