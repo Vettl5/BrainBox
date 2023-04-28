@@ -3,9 +3,9 @@
 // Output: Neue Notiz wird erstellt
 
 //Libraries:
-import 'dart:io';
+//import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
+//import 'package:path_provider/path_provider.dart';
 
 //Dateien:
 import 'main.dart';
@@ -20,42 +20,27 @@ class NeueNotiz extends StatefulWidget {
 }
 
 class _NeueNotizState extends State<NeueNotiz> {                              //State Klasse für NeueNotiz; Private Klasse, da nur in NeueNotiz verwendet
-  Future<Directory?>? _appDocumentsDirectory;
-  final _formKey = GlobalKey<FormState>();                                    //GlobalKey für Formular, um Eingabe zu überprüfen, durch validator (s.u.)
+ final _formKey = GlobalKey<FormState>();                                    //GlobalKey für Formular, um Eingabe zu überprüfen, durch validator (s.u.)
   final TextEditingController _nameController = TextEditingController();      //Controller für Eingabe des Namens der Notiz
-  late MyAppState appState;
+  var appState =  MyAppState();                                                //appState wird erstellt, um auf die Liste der Notizen zuzugreifen
   
   
   void _submitForm() {                                                        //Funktion, die die Notiz erstellt, speichert und öffnen veranlasst
     if (_formKey.currentState!.validate()) {                                  //Wenn Eingabe valide, dann Datei generieren, sonst siehe validator (s.u.)
       final name = _nameController.text;
       if (name.isNotEmpty) {
-        addNotiz(name);                                                      //Übergibt Namen der Notiz an addNotiz() in main.dart
+        appState.addNotiz(name);                                              //Übergibt Namen der Notiz an addNotiz() in main.dart --> MyAppState
       }
     }
   }
 
-  void _requestAppDocumentsDirectory() {
-    setState(() {
-      _appDocumentsDirectory = getApplicationDocumentsDirectory();
-    });
-
-  }
-
-  void addNotiz(String name) {
-    _requestAppDocumentsDirectory();
-    final newFilePath = '$_appDocumentsDirectory/$name.txt';                          // Pfad der neuen .txt-Datei
-    final newFile = File(newFilePath);                                                // neue .txt-Datei wird erstellt
-    appState.notizen.add(name);                                                       // Notizname zur Liste der Notizen hinzufügen
-    openAndEditFile(context, newFile);                                                // Notiz als .txt-Datei speichern
-    }
-
+/*
   void removeNotiz(String name) {
-    final filePath = '$getApplicationDocumentsDirectory/$name.txt';
+    final filePath = '$_appDocumentsDirectory/$name.txt';
     final file = File(filePath);
     file.deleteSync();                                                                // .txt-Datei aus Pfad löschen
-    appState.notizen.remove(name);                                                             // Notizname aus Liste der Notizen entfernen
-  }
+    appState.notizen.remove(name);                                                    // Notizname aus Liste der Notizen entfernen
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +51,7 @@ class _NeueNotizState extends State<NeueNotiz> {                              //
           Form(                                                             //Eingabeformular Feld
             key: _formKey,                                                  //Debugging Key für aktuelles Formular, macht Eingabe überprüfbar/zuweisbar
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
               child: TextFormField(                                         //Textfeld, in dem der Name der Notiz eingegeben werden kann
                 controller: _nameController,
                 validator: (value) {
@@ -99,12 +84,3 @@ class _NeueNotizState extends State<NeueNotiz> {                              //
         //Sollte lieber in main.dart passieren, da dort auch die Liste der Notizen verwaltet wird
         /*Navigator.pop(context);                                     //Schließt aktuelle Seite
         Navigator.pushNamed(context, '/bearbeiten', arguments: notiz);  //Öffnet NotizBearbeiten() mit der erstellten Notiz*/
-
-/*Future<Directory> getApplicationDocumentsDirectory() async {
-    final String? path = await _platform.getApplicationDocumentsDirectory();
-        if (path == null) {
-      throw MissingPlatformDirectoryException(
-        'Unable to get application documents directory');
-    }
-    return Directory(path);
-  }*/

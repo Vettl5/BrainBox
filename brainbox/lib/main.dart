@@ -1,6 +1,8 @@
 //import 'dart:io';
 //import 'package:path/path.dart';
-//import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -39,12 +41,24 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 
 class MyAppState extends ChangeNotifier {
+  Future<Directory?>? _appDocumentsDirectory;
   List<String> notizen = [];                                       // Liste der Notizen wird initialisiert, soll Namen speichern
-  
+
+  void _requestAppDocumentsDirectory() {                           // Funktion, die den Pfad des Ordners der App speichert
+    _appDocumentsDirectory = getApplicationDocumentsDirectory();
+  }
+
+  void addNotiz(String name) {                                                        // Funktion, die Notiz zur Liste hinzufügt
+    _requestAppDocumentsDirectory();
+    final newFilePath = '$_appDocumentsDirectory/$name.txt';                          // Pfad der neuen .txt-Datei
+    final newFile = File(newFilePath);                                                // neue .txt-Datei wird erstellt
+    notizen.add(name);                                                                // Notizname zur Liste der Notizen hinzufügen
+    Text('Notiz $name wurde erstellt! Sie können sie in der Übersicht einsehen!');
+    notifyListeners();                                                                // Listener wird benachrichtigt, dass eine Notiz hinzugefügt wurde
+    //openAndEditFile(context, newFile);
+  }
 }
 
-
- 
 
 class MyHomePage extends StatefulWidget {                           //Widget von MyHomePage (quasi gesamter Bildschirm)
   const MyHomePage({super.key});                                    //Konstruktor für MyHomePage
@@ -52,9 +66,9 @@ class MyHomePage extends StatefulWidget {                           //Widget von
   State<MyHomePage> createState() => _MyHomePageState();            //State für MyHomePage wird erstellt
 }
 
+
 class _MyHomePageState extends State<MyHomePage> {                  //State Klasse für MyHomePage; Private Klasse, da nur in MyHomePage verwendet
-  
-  var selectedIndex = 0;                          //Variable selectedIndex mit Wert 0 (Startseite) wird erstellt
+   var selectedIndex = 0;                          //Variable selectedIndex mit Wert 0 (Startseite) wird erstellt
   
   @override
   Widget build(BuildContext context) {
@@ -76,6 +90,48 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
 
     return Scaffold(
       body: Column(
+        children: [
+          Expanded(
+            child: page,
+          ),
+          
+          
+          SafeArea(
+            child: BottomAppBar(
+              child: BottomNavigationBar(                     //error-causing widget
+                //backgroundColor: Colors.white,
+                items: const <BottomNavigationBarItem>[
+                  BottomNavigationBarItem(                          //Notizenübesicht, Startseite
+                    icon: Icon(Icons.menu),         
+                    label: 'Notizen',
+                  ),
+                  BottomNavigationBarItem(                          //Neue Notiz anlegen
+                    icon: Icon(Icons.add_circle_outline),     
+                    label: 'Neue Notiz',
+                  ),
+                  BottomNavigationBarItem(                          //Einstellungen
+                    icon: Icon(Icons.settings),     
+                    label: 'Settings',
+                  ),
+                ],
+                currentIndex: selectedIndex,       
+                onTap: (value) {                     
+                  setState(() {                     
+                    selectedIndex = value;                          //selectedIndex wird auf den Wert von value gesetzt, entsprechende page im nächsten reload     
+                    print(value);                                   //Ausgabe des Wertes von value in der Konsole, nur zur Kontrolle                   
+                  });
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+/*body: Column(
         children: [
           Expanded(
             child: Container(
@@ -112,41 +168,6 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
             );                                
           },
         ),
-      ),
-    );
-  }
-}
-
-
-/*body: Column(
-        children: [
-          Expanded(                                 //oberes Widget, Page (s.o.) (SafeArea bewirkt Barrierefreiheit ggü. Notch etc.)
-            child: Container(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: page,                          //Variable page aufrufen als Inhalt; basierend auf selectedIndex wird die entsprechende Seite aufgerufen
-            ),
-          ),
-          BottomAppBar(                             //Untere Leiste, BottomAppBar mit BottomNavigationBar Buttons
-            child: BottomNavigationBar(
-              backgroundColor: Colors.white,                    //Hintergrundfarbe    
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(                          //Notizenübesicht, Startseite
-                  icon: Icon(Icons.menu),         
-                  label: 'Notizen',
-                ),
-                BottomNavigationBarItem(                          //Neue Notiz anlegen
-                  icon: Icon(Icons.add_circle_outline),     
-                  label: 'Neue Notiz',
-                ),
-                BottomNavigationBarItem(                          //Einstellungen
-                  icon: Icon(Icons.settings),     
-                  label: 'Settings',
-                ),
-              ],
-              
-            ),
-          ),
-        ],
       ),*/
 
 

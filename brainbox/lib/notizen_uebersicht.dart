@@ -18,13 +18,14 @@ class Notizen extends StatefulWidget {
 
 
 class _NotizenState extends State<Notizen> {
-  late final MyAppState appState;
+  //late final MyAppState appState;
+  var appState =  MyAppState();
 
-  @override
+ /* @override
   void initState() {
     super.initState();
     appState = MyAppState();
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {   
@@ -32,10 +33,27 @@ class _NotizenState extends State<Notizen> {
   }
 
   Widget buildNotizenListe() {
+
+    
     if (appState.notizen.isEmpty) {
       return Text('Du hast noch keine Notizen erstellt.');
     } else {
-      return ListView.builder(
+      return ListView(
+      padding: EdgeInsets.all(16.0),
+      shrinkWrap: true,
+      physics: BouncingScrollPhysics(),
+      children: [
+        for (var notiz in appState.notizen)
+          ListTile(
+            title: Text(notiz),
+            onTap: () {
+              openAndEditFile(context, File(notiz));
+              Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': File(notiz)});
+            },
+          ),
+      ],
+    );
+      /*return ListView.builder(
         shrinkWrap: true,
         physics: BouncingScrollPhysics(),
         itemCount: appState.notizen.length,
@@ -47,7 +65,7 @@ class _NotizenState extends State<Notizen> {
             },
           );
         },
-      );
+      );*/
     }
   }
 }
