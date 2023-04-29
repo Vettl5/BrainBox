@@ -1,11 +1,11 @@
 //Notizenübersicht auf Homescreen
 
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 //import 'package:provider/provider.dart';
 
 import 'main.dart';
-import 'notizen_bearbeiten.dart';
+//import 'notizen_bearbeiten.dart';
 
 /*----------------------------------------------------------------------------------------------*/
 
@@ -16,40 +16,48 @@ class Notizen extends StatefulWidget {
 }
 
 
-
 class _NotizenState extends State<Notizen> {
-  //var appState =  MyAppState();
-
+  
   @override
-  Widget build(BuildContext context) {   
-    var appState = MyAppState();
+  Widget build(BuildContext context) { 
+    var appState = context.watch<MyAppState>();
     return buildNotizenListe(appState);                                     
   }
 
   Widget buildNotizenListe(MyAppState appState) {
+    List<String> notizenname = appState.notizenname;
+    if (appState.notizenname.isEmpty) {
+      return Center(
+        child: Text('Du hast noch keine Notizen erstellt.'),
+      );
+    }
+
     return Center(
-      child: appState.notizen.isEmpty
-          ? Text('Du hast noch keine Notizen erstellt.')
-          : ListView(
-              padding: const EdgeInsets.all(40),
+      child: ListView(
+              padding: const EdgeInsets.all(20),
               shrinkWrap: true,
               physics: BouncingScrollPhysics(),
               children: [
-                for (var notiz in appState.notizen)
+
+                for (var notiz in notizenname)
                   ListTile(
                     title: Text(notiz),
                     onTap: () {
-                      openAndEditFile(context, File(notiz));
-                      Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': File(notiz)});
+                      //openAndEditFile(context, File(notiz));
+                      //Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': File(notiz)});
                     },
                   ),
+                  
               ],
             ),
     );
   }
 }
 
-/* @override
+//var appState =  MyAppState();
+  //late MyAppState appState;
+
+  /*@override
   void initState() {
     super.initState();
     appState = MyAppState();
@@ -58,10 +66,10 @@ class _NotizenState extends State<Notizen> {
 /*return ListView.builder(
         shrinkWrap: true,
         physics: BouncingScrollPhysics(),
-        itemCount: appState.notizen.length,
+        itemCount: appState.notizenname.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text(appState.notizen[index]),
+            title: Text(appState.notizenname[index]),
             onTap: () {
               openAndEditFile(context, File(appState.notizen[index]));
             },

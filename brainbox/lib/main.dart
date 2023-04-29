@@ -42,23 +42,50 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 class MyAppState extends ChangeNotifier {
   Future<Directory?>? _appDocumentsDirectory;
-  List<String> notizen = [];                                       // Liste der Notizen wird initialisiert, soll Namen speichern
-
-  void _requestAppDocumentsDirectory() {                           // Funktion, die den Pfad des Ordners der App speichert
-    _appDocumentsDirectory = getApplicationDocumentsDirectory();
+  List<String> notizenname = [];                                       // Liste der Notizen wird initialisiert, soll Namen speichern
+  
+  MyAppState() {                                                    // Konstruktor für MyAppState, wird beim Start der App aufgerufen
+    _requestAppDocumentsDirectory();                                // Funktion wird aufgerufen
+    //loadNotizen();                                                  // Funktion wird aufgerufen
   }
 
+  void _requestAppDocumentsDirectory() {                            // Funktion, die den Pfad des Ordners der App speichert
+    _appDocumentsDirectory = getApplicationDocumentsDirectory();    // speichert einmalig den Pfad des Ordners der App in _appDocumentsDirectory
+  }
+
+  
+  /*void loadNotizen() async {                                        // Funktion, die die Liste der Notizen neu lädt (wird bei Änderungen aufgerufen, um z.B. notizen_uebersicht.dart zu aktualisieren)
+    final appDocumentsDirectory = await _appDocumentsDirectory;     // _appDocumentsDirectory muss in appDocumentsDirectory gespeichert werden, da _appDocumentsDirectory sonst nicht in der Funktion verwendet werden kann
+    final files = appDocumentsDirectory!.listSync();                // Liste der Dateien im Ordner der App wird gespeichert
+    notizenname = files
+        .where((file) => file.path.endsWith('.txt'))                // Nur Dateien, die auf .txt enden, werden ausgewählt
+        .map((file) => file.path).toList();                         // Namen der Dateien werden zur Liste der Notizen hinzugefügt
+    notifyListeners();                                              // Listener wird benachrichtigt, dass die Notizen geladen wurden
+  }*/
+
   void addNotiz(String name) {                                                        // Funktion, die Notiz zur Liste hinzufügt
-    _requestAppDocumentsDirectory();
-    final newFilePath = '$_appDocumentsDirectory/$name.txt';                          // Pfad der neuen .txt-Datei
-    final newFile = File(newFilePath);                                                // neue .txt-Datei wird erstellt
-    notizen.add(name);                                                                // Notizname zur Liste der Notizen hinzufügen
-    Text('Notiz $name wurde erstellt! Sie können sie in der Übersicht einsehen!');
-    notifyListeners();                                                                // Listener wird benachrichtigt, dass eine Notiz hinzugefügt wurde
-    //openAndEditFile(context, newFile);
+    /*final newFilePath = '$_appDocumentsDirectory/$name.txt';                          // Pfad der neuen .txt-Datei
+    final newFile = File(newFilePath);                                                // Erzeugt Objekt vom Typ File im Pfad von newFilePath
+    newFile.createSync(); */                                                            // legt neue .txt-Datei im Pfad von newFilePath an
+    notizenname.add(name);                                                            // Notizname zur Liste der Notizen hinzufügen
+    
+    notifyListeners();
+  }
+
+  
+  void removeNotiz(String name) {
+    final filePath = '$_appDocumentsDirectory/$name.txt';
+    final file = File(filePath);
+    file.deleteSync();                                                                // .txt-Datei aus Pfad löschen
+    //notizenname.remove(name);                                                    // Notizname aus Liste der Notizen entfernen
+    notifyListeners();
   }
 }
 
+/*----------------------------------------------------------------------------------------------------------*/
+
+
+//StatefulWidget nötig, da sich die Startseite entsprechend des selectedIndex ändert (Notizenübersicht, Neue Notiz, Einstellungen)
 
 class MyHomePage extends StatefulWidget {                           //Widget von MyHomePage (quasi gesamter Bildschirm)
   const MyHomePage({super.key});                                    //Konstruktor für MyHomePage
@@ -68,8 +95,9 @@ class MyHomePage extends StatefulWidget {                           //Widget von
 
 
 class _MyHomePageState extends State<MyHomePage> {                  //State Klasse für MyHomePage; Private Klasse, da nur in MyHomePage verwendet
-   var selectedIndex = 0;                          //Variable selectedIndex mit Wert 0 (Startseite) wird erstellt
-  
+  var selectedIndex = 0;                                           //Variable selectedIndex mit Wert 0 (Startseite) wird erstellt
+  bool _isDeleting = false;
+
   @override
   Widget build(BuildContext context) {
     
@@ -101,149 +129,57 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
         builder: (context, constraints) {
           return Column(
             children: [
+              AppBar(
+                title: const Text('BrainBox'),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.delete, size: 30, color: Colors.white),
+                    onPressed: () {
+                      setState(() {
+                        _isDeleting = !_isDeleting;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Wählen Sie die Notiz aus, die Sie löschen möchten!'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    },
+                  ),  
+                ],
+              ),
               Expanded(child: mainArea),
               SafeArea(
-                child: BottomAppBar(
-                  child: BottomNavigationBar(                     //error-causing widget
-                    //backgroundColor: Colors.white,
-                    items: const <BottomNavigationBarItem>[
-                      BottomNavigationBarItem(                          //Notizenübesicht, Startseite
-                        icon: Icon(Icons.menu),         
-                        label: 'Notizen',
-                      ),
-                      BottomNavigationBarItem(                          //Neue Notiz anlegen
-                        icon: Icon(Icons.add_circle_outline),     
-                        label: 'Neue Notiz',
-                      ),
-                      BottomNavigationBarItem(                          //Einstellungen
-                        icon: Icon(Icons.settings),     
-                        label: 'Settings',
-                      ),
-                    ],
-                    currentIndex: selectedIndex,       
-                    onTap: (value) {                     
-                      setState(() {                     
-                        selectedIndex = value;                          //selectedIndex wird auf den Wert von value gesetzt, entsprechende page im nächsten reload     
-                        print(value);                                   //Ausgabe des Wertes von value in der Konsole, nur zur Kontrolle                   
-                      });
-                    },
-                  ),
+                child: BottomNavigationBar(                     //error-causing widget
+                  backgroundColor: Color.fromARGB(255, 167, 213, 255),
+                  items: const <BottomNavigationBarItem>[
+                    BottomNavigationBarItem(                          //Notizenübesicht, Startseite
+                      icon: Icon(Icons.menu),         
+                      label: 'Notizen',
+                    ),
+                    BottomNavigationBarItem(                          //Neue Notiz anlegen
+                      icon: Icon(Icons.add_circle_outline),     
+                      label: 'Neue Notiz',
+                    ),
+                    BottomNavigationBarItem(                          //Einstellungen
+                      icon: Icon(Icons.settings),     
+                      label: 'Settings',
+                    ),
+                  ],
+                  currentIndex: selectedIndex,       
+                  onTap: (value) {                     
+                    setState(() {                     
+                      selectedIndex = value;                          //selectedIndex wird auf den Wert von value gesetzt, entsprechende page im nächsten reload     
+                      print(value);                                   //Ausgabe des Wertes von value in der Konsole, nur zur Kontrolle                   
+                    });
+                  },
                 ),
               ),
             ],
           );
         },
       ),
-      /*body: Column(
-        children: [
-          SafeArea(
-            child: Container(
-              ,
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: page,
-            ), 
-            page,
-          ),
-          
-          
-          SafeArea(
-            child: BottomAppBar(
-              child: BottomNavigationBar(                     //error-causing widget
-                //backgroundColor: Colors.white,
-                items: const <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(                          //Notizenübesicht, Startseite
-                    icon: Icon(Icons.menu),         
-                    label: 'Notizen',
-                  ),
-                  BottomNavigationBarItem(                          //Neue Notiz anlegen
-                    icon: Icon(Icons.add_circle_outline),     
-                    label: 'Neue Notiz',
-                  ),
-                  BottomNavigationBarItem(                          //Einstellungen
-                    icon: Icon(Icons.settings),     
-                    label: 'Settings',
-                  ),
-                ],
-                currentIndex: selectedIndex,       
-                onTap: (value) {                     
-                  setState(() {                     
-                    selectedIndex = value;                          //selectedIndex wird auf den Wert von value gesetzt, entsprechende page im nächsten reload     
-                    print(value);                                   //Ausgabe des Wertes von value in der Konsole, nur zur Kontrolle                   
-                  });
-                },
-              ),
-            ),
-          ),
-        ],
-      ),*/
     );
   }
 }
-
-
-/*body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: page,
-            ),
-          ),
-        ],
-      ),
-      //Noch nicht perfekt, aber BottomNavigationBar rutscht nicht nach unten weg. Container ist momentan nur so breit wie Text lang ist
-      bottomNavigationBar: BottomAppBar(
-        child: BottomNavigationBar(
-          backgroundColor: Colors.white,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.menu),
-              label: 'Notizen',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle_outline),
-              label: 'Neue Notiz',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Settings',
-            ),
-          ],
-          currentIndex: selectedIndex,       
-          onTap: (value) {                     
-            setState(() {                     
-              selectedIndex = value;                          //selectedIndex wird auf den Wert von value gesetzt, entsprechende page im nächsten reload     
-              print(value);                                   //Ausgabe des Wertes von value in der Konsole, nur zur Kontrolle                   
-              }
-            );                                
-          },
-        ),
-      ),*/
-
-
-  //Alte Version
-  /*String name = '';                                     //Variable name mit Wert '' (leerer String) wird erstellt
-  String text = '';                                     //Variable text mit Wert [] (leere Liste) wird erstellt
-
-  notiz (String name, String text){                     //Funktion notiz mit Parameter name und text wird erstellt
-    this.name = name;
-    this.text = text;
-  }                                                     //Variable notiz mit Wert [] (leere Liste) wird erstellt
-
-  void addNotiz(notiz) {                                              //Funktion addNotiz mit Parameter notiz wird erstellt
-    notiz.add(notiz);                                                 //notiz wird der Liste notiz hinzugefügt
-    notifyListeners();                                                //Änderung wird an alle Widgets weitergegeben
-  }
-
-  void removeNotiz(notiz) {                                           //Funktion removeNotiz mit Parameter notiz wird erstellt
-    notiz.remove(notiz);                                              //notiz wird aus der Liste notiz entfernt
-    notifyListeners();                                                //Änderung wird an alle Widgets weitergegeben
-  }*/
-
-  /*Directory? _appDocumentsDir;                                        //Variable appDocumentsDir mit Klasse Directory linken
-  Directory? get appDocumentsDir => _appDocumentsDir;                   //Getter für appDocumentsDir
-
-  void setAppDocumentsDir(Directory dir) {                              //Setter für appDocumentsDir
-    _appDocumentsDir = dir;                                             //appDocumentsDir wird mit dir verlinkt
-    notifyListeners();                                                  //Änderung wird an alle Widgets weitergegeben
-  }*/

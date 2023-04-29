@@ -5,45 +5,64 @@
 //Libraries:
 //import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 //import 'package:path_provider/path_provider.dart';
 
 //Dateien:
 import 'main.dart';
-import 'notizen_bearbeiten.dart';
+//import 'notizen_bearbeiten.dart';
 //---------------------------------------------------------------------------------------------------------------
 
 //Klassen:
 class NeueNotiz extends StatefulWidget {
-  const NeueNotiz({super.key});                                               //Konstruktor für NeueNotiz
+  const NeueNotiz({Key? key}) : super(key: key);
   @override
-  State<NeueNotiz> createState() => _NeueNotizState();                        //State für NeueNotiz wird erstellt
+  State<NeueNotiz> createState() => _NeueNotizState();
 }
 
-class _NeueNotizState extends State<NeueNotiz> {                              //State Klasse für NeueNotiz; Private Klasse, da nur in NeueNotiz verwendet
- final _formKey = GlobalKey<FormState>();                                    //GlobalKey für Formular, um Eingabe zu überprüfen, durch validator (s.u.)
-  final TextEditingController _nameController = TextEditingController();      //Controller für Eingabe des Namens der Notiz
-  var appState =  MyAppState();                                                //appState wird erstellt, um auf die Liste der Notizen zuzugreifen
-  
-  
-  void _submitForm() {                                                        //Funktion, die die Notiz erstellt, speichert und öffnen veranlasst
-    if (_formKey.currentState!.validate()) {                                  //Wenn Eingabe valide, dann Datei generieren, sonst siehe validator (s.u.)
-      final name = _nameController.text;
-      if (name.isNotEmpty) {
-        appState.addNotiz(name);                                              //Übergibt Namen der Notiz an addNotiz() in main.dart --> MyAppState
-      }
-    }
-  }
-
-/*
-  void removeNotiz(String name) {
-    final filePath = '$_appDocumentsDirectory/$name.txt';
-    final file = File(filePath);
-    file.deleteSync();                                                                // .txt-Datei aus Pfad löschen
-    appState.notizen.remove(name);                                                    // Notizname aus Liste der Notizen entfernen
-  }*/
+class _NeueNotizState extends State<NeueNotiz> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
+    void submitForm() {                                                       //Funktion, die die Notiz erstellt, speichert und öffnen veranlasst
+      if (_formKey.currentState!.validate()) {                                //Wenn Eingabe valide, dann
+        final name = _nameController.text;
+        if (name.isNotEmpty) {                                                //Wenn Eingabe nicht leer
+          if (appState.notizenname.contains(name)) {                          //Wenn Notiz bereits existiert, dann Fehlermeldung
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Tut mir leid, dieser Name existiert bereits!'),
+              ),
+            );
+            return;                                                           //Funktion wird beendet
+          } //sonst
+          appState.addNotiz(name);                                            //Übergibt Namen der Notiz an addNotiz() in main.dart --> MyAppState
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Notiz erstellt!'),
+                  content: Text('Sie können Sie nun unter Notizen einsehen und bearbeiten!'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+            //Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': name});   //Öffnet NotizBearbeiten() mit der erstellten Notiz
+          }
+      }
+    }
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -70,12 +89,13 @@ class _NeueNotizState extends State<NeueNotiz> {                              //
           ),
           SizedBox(height: 20.0),                                           //Abstandshalter zwischen Textfeld und Button
           ElevatedButton(
-            onPressed: _submitForm,                                         //Gültigkeit der Eingabe wird geprüft
+            onPressed: submitForm,                                         //Gültigkeit der Eingabe wird geprüft
             child: Text('Erstellen'),
           ),  //ElevatedButton
         ],  //children
       ),  //Column
     ); //Center
+
   } //Widget build
 } //NeueNotizState
 
