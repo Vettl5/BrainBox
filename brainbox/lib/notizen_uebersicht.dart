@@ -26,14 +26,28 @@ class _NotizenState extends State<Notizen> {
 
   Widget buildNotizenListe(MyAppState appState) {
     List<String> notizenname = appState.notizenname;
-    if (appState.notizenname.isEmpty) {
+    if (notizenname.isEmpty) {
       return Center(
         child: Text('Du hast noch keine Notizen erstellt.'),
       );
     }
 
     return Center(
-      child: ListView(
+      child: ListView.builder(
+        shrinkWrap: true,
+        physics: BouncingScrollPhysics(),
+        itemCount: appState.notizenname.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            leading: _isDeleting ? Checkbox(value: false, onChanged: (value) { }) : null,
+            title: Text(notizenname[index]),
+            onTap: () {
+              //openAndEditFile(context, File(appState.notizen[index]));
+            },
+          );
+        },
+      ),
+      /*ListView(
               padding: const EdgeInsets.all(20),
               shrinkWrap: true,
               physics: BouncingScrollPhysics(),
@@ -49,7 +63,7 @@ class _NotizenState extends State<Notizen> {
                   ),
                   
               ],
-            ),
+            ),*/
     );
   }
 }
