@@ -44,7 +44,13 @@ class _NeueNotizState extends State<NeueNotiz> {
           showDialog(
               context: context,
               builder: (BuildContext context) {
-                return AlertDialog(
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Notiz erstellt!'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+                /*return AlertDialog(
                   title: Text('Notiz erstellt!'),
                   content: Text('Sie können Sie nun unter Notizen einsehen und bearbeiten!'),
                   actions: [
@@ -55,7 +61,7 @@ class _NeueNotizState extends State<NeueNotiz> {
                       child: Text('OK'),
                     ),
                   ],
-                );
+                );*/
               },
             );
             //Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': name});   //Öffnet NotizBearbeiten() mit der erstellten Notiz

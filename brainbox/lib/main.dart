@@ -96,7 +96,7 @@ class MyHomePage extends StatefulWidget {                           //Widget von
 
 class _MyHomePageState extends State<MyHomePage> {                  //State Klasse für MyHomePage; Private Klasse, da nur in MyHomePage verwendet
   var selectedIndex = 0;                                           //Variable selectedIndex mit Wert 0 (Startseite) wird erstellt
-  bool _isDeleting = false;
+  
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
               AppBar(
                 title: const Text('BrainBox'),
                 backgroundColor: Theme.of(context).colorScheme.primary,
-                actions: [
+                /*actions: [
                   IconButton(
                     icon: const Icon(Icons.delete, size: 30, color: Colors.white),
                     onPressed: () {
@@ -147,11 +147,11 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
                       );
                     },
                   ),  
-                ],
+                ],*/
               ),
               Expanded(child: mainArea),
               SafeArea(
-                child: BottomNavigationBar(                     //error-causing widget
+                child: BottomNavigationBar(
                   backgroundColor: Color.fromARGB(255, 167, 213, 255),
                   items: const <BottomNavigationBarItem>[
                     BottomNavigationBarItem(                          //Notizenübesicht, Startseite
