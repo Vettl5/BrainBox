@@ -129,26 +129,6 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
         builder: (context, constraints) {
           return Column(
             children: [
-              AppBar(
-                title: const Text('BrainBox'),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                /*actions: [
-                  IconButton(
-                    icon: const Icon(Icons.delete, size: 30, color: Colors.white),
-                    onPressed: () {
-                      setState(() {
-                        _isDeleting = !_isDeleting;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Wählen Sie die Notiz aus, die Sie löschen möchten!'),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
-                    },
-                  ),  
-                ],*/
-              ),
               Expanded(child: mainArea),
               SafeArea(
                 child: BottomNavigationBar(
@@ -164,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
                     ),
                     BottomNavigationBarItem(                          //Einstellungen
                       icon: Icon(Icons.settings),     
-                      label: 'Settings',
+                      label: 'Einstellungen',
                     ),
                   ],
                   currentIndex: selectedIndex,       

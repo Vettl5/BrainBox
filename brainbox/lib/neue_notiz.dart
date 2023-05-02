@@ -41,66 +41,65 @@ class _NeueNotizState extends State<NeueNotiz> {
             return;                                                           //Funktion wird beendet
           } //sonst
           appState.addNotiz(name);                                            //Übergibt Namen der Notiz an addNotiz() in main.dart --> MyAppState
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Notiz erstellt!'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-                /*return AlertDialog(
-                  title: Text('Notiz erstellt!'),
-                  content: Text('Sie können Sie nun unter Notizen einsehen und bearbeiten!'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('OK'),
-                    ),
-                  ],
-                );*/
-              },
-            );
-            //Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': name});   //Öffnet NotizBearbeiten() mit der erstellten Notiz
-          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Notiz erstellt!'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          //Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': name});   //Öffnet NotizBearbeiten() mit der erstellten Notiz
+        }
       }
     }
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Form(                                                             //Eingabeformular Feld
-            key: _formKey,                                                  //Debugging Key für aktuelles Formular, macht Eingabe überprüfbar/zuweisbar
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
-              child: TextFormField(                                         //Textfeld, in dem der Name der Notiz eingegeben werden kann
-                controller: _nameController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {                     //validator prüft, ob Eingabe ungültig ist
-                    return 'Sie müssen einen gültigen Namen vergeben!';
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  hintText: 'Name der Notiz:',
-                  labelText: 'Notizname',
-                  border: OutlineInputBorder(),
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Column(
+            children: [
+              AppBar(
+                title: const Text('BrainBox', 
+                  style: TextStyle(
+                    fontSize: 30, 
+                    fontWeight: FontWeight.bold, 
+                    color: Colors.white,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                ),
+              SizedBox(height: 20.0),                                           //Abstandshalter zwischen AppBar und Textfeld
+              Form(      
+                //mainAxisAlignment: MainAxisAlignment.center,                                                       //Eingabeformular Feld
+                key: _formKey,                                                  //Debugging Key für aktuelles Formular, macht Eingabe überprüfbar/zuweisbar
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
+                  child: TextFormField(                                         //Textfeld, in dem der Name der Notiz eingegeben werden kann
+                    controller: _nameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {                     //validator prüft, ob Eingabe ungültig ist
+                        return 'Sie müssen einen gültigen Namen vergeben!';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Name der Notiz:',
+                      labelText: 'Notizname',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          SizedBox(height: 20.0),                                           //Abstandshalter zwischen Textfeld und Button
-          ElevatedButton(
-            onPressed: submitForm,                                         //Gültigkeit der Eingabe wird geprüft
-            child: Text('Erstellen'),
-          ),  //ElevatedButton
-        ],  //children
-      ),  //Column
-    ); //Center
+              SizedBox(height: 20.0),                                           //Abstandshalter zwischen Textfeld und Button
+              ElevatedButton(
+                onPressed: submitForm,                                         //Gültigkeit der Eingabe wird geprüft
+                child: Text('Erstellen'),
+              ),  //ElevatedButton
+            ],  //children
+          );  //Column
+        },
+      ), //Center
+    );
 
   } //Widget build
 } //NeueNotizState
