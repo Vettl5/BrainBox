@@ -17,6 +17,8 @@ class Notizen extends StatefulWidget {
 
 class _NotizenState extends State<Notizen> {
   bool _isDeleting = false;                                 //Löschfunktion ausgewählt
+  bool _isChecked = false;                                  //Checkboxen State (angetickt oder nicht)
+  List<bool> _isCheckedList = [];                           //Liste der angetickten Notizen (if _isChecked true -> _isCheckedList true)
   var appBarStateIndex = 0;
 
 
@@ -164,33 +166,42 @@ class _NotizenState extends State<Notizen> {
             ],
         );
 
+    //Widget Listenelemente
+
     Widget emptyListChecker = notizenname.isEmpty == true
         ? Center(
             child: Text('Keine Notizen vorhanden!'),
           )
-        : ListView.builder(                                             //Auflistung der Notizen
+        : ListView(                                             //Auflistung der Notizen
                 shrinkWrap: true,
                 physics: BouncingScrollPhysics(),
-                itemCount: appState.notizenname.length,
-                itemBuilder: (context, index) {
+                // itemCount: appState.notizenname.length,
+                children: notizenname
+                  .map((e) => Text(e))
+                  .toList(),
+                /*itemBuilder: (context, index) {
                   return ListTile(
                     leading: _isDeleting                              //Checkbox, um zu löschende Notizen auszuwählen
                             ? Checkbox(                               //wenn _isDeleting true ist, wird Checkbox angezeigt
                                 checkColor: Colors.white, 
                                 fillColor: MaterialStateProperty.resolveWith(getColor), 
-                                value: false, onChanged: (value) {
+                                value: _isChecked, 
+                                onChanged: (value) {
                                   setState(() {
-                                    _isDeleting = value!;
+                                    _isChecked = value!;
                                   });
                                 },
                               ) 
                             : null,
+                    
                     title: Text(notizenname[index]),
                     onTap: () {
                       //openAndEditFile(context, File(appState.notizen[index]));
                     },
                   );
-                },
+                },*/
+                //Divider();
+                
               );
 
     /*--------------------------------------------------------LISTVIEW-----------------------------------------------------------*/
