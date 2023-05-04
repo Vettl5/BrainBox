@@ -14,18 +14,19 @@ class MyAppBar extends StatefulWidget {
 
 
 class _AppBarState extends State<MyAppBar> {
-  bool _isDeleting = false;                                 //Checkboxen State (angetickt oder nicht)
+  bool _isDeleting = false;                                //Checkboxen State (angetickt oder nicht)
   var appBarStateIndex = 0;
 
   void changeAppBarState() {                                //sich ändernde Appbar, wenn Option in Optionsmenü ausgewählt wurde
     setState(() {
       if (appBarStateIndex == 0) {
         appBarStateIndex = 1;                               //Löschfunktion ausgewählt
-        _isDeleting = true;    
+        Provider.of<MyAppState>(context, listen: false).deleteState(_isDeleting);    
       } else {
         appBarStateIndex = 0;                               //zurück zu normaler AppBar
-        _isDeleting = false;
+        Provider.of<MyAppState>(context, listen: false).deleteState(_isDeleting);
       }
+      //_isDeleting
     });
   }
 
@@ -59,9 +60,10 @@ class _AppBarState extends State<MyAppBar> {
                         height: 200,
                         child: Column(
                           children: [
+                            //Notizen löschen, aktiviert Checkboxen in widget_notizen.dart:
                             ListTile(
                               leading: Icon(Icons.delete),
-                              title: Text('Notizen Löschen'),                                 //Option #1
+                              title: Text('Notizen Löschen'),         //Option #1
                               onTap: () {
                                 setState(() {
                                   _isDeleting = true;
@@ -77,12 +79,13 @@ class _AppBarState extends State<MyAppBar> {
                                 );
                               },
                             ),
-                            //Noch ohne Funktion:
+                            //Einstellungen öffnen:
                             ListTile(
-                              leading: Icon(Icons.edit),
-                              title: Text('Einstellungen'),
+                              leading: Icon(Icons.settings),
+                              title: Text('Einstellungen'),           //Option #2
                               onTap: () {
-                                
+                                Navigator.pop(context);
+                                Navigator.pushNamed(context, '/einstellungen');
                               },
                               
                             ),
@@ -120,16 +123,11 @@ class _AppBarState extends State<MyAppBar> {
                 onPressed: () {
                   AlertDialog(
                     title: Text('Notiz löschen'),
-                    content: Text('Möchten Sie die Notiz wirklich löschen?'),
+                    content: Text('Möchten Sie die Notiz:en wirklich löschen?'),
                     actions: [
                       TextButton(
                         child: Text('Abbrechen'),
                         onPressed: () {
-                          setState(() {
-                            _isDeleting = false;
-                            changeAppBarState();
-                            // CheckboxViewer();                //aktiviert Checkboxen in widget_notizen.dart
-                          });
                           Navigator.pop(context);
                         },
                       ),
@@ -137,6 +135,7 @@ class _AppBarState extends State<MyAppBar> {
                         child: Text('Löschen'),
                         onPressed: () {
                           setState(() {
+                            appState.removeNotizen();
                             changeAppBarState();
                           });
                           Navigator.pop(context);

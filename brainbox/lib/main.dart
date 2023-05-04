@@ -43,18 +43,42 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 class MyAppState extends ChangeNotifier {
   Future<Directory?>? _appDocumentsDirectory;
-  List<String> notizenname = [];                                       // Liste der Notizen wird initialisiert, soll Namen speichern
-  
+  List<String> notizenname = [];                                    // Liste der Notizen wird initialisiert, soll Namen speichern
+  bool _isDeleting = false;                                         // Checkboxen State (werden angezeigt oder nicht)
+  bool get isDeleting => _isDeleting;                               // public bool für widget_notizenliste.dart
+  List<String> tickedForDeletion = [];                              // zum löschen ausgewählte Notizen
+
   MyAppState() {                                                    // Konstruktor für MyAppState, wird beim Start der App aufgerufen
-    _requestAppDocumentsDirectory();                                // Funktion wird aufgerufen
-    //loadNotizen();                                                  // Funktion wird aufgerufen
+    _requestAppDocumentsDirectory();                                
+    //loadNotizen();                                                
+  }
+
+  //Übergabe _isDeleting von widget_appbar.dart an notizen_uebersicht.dart
+  //wird genutzt, um Checkboxen entweder anzuzeigen oder auszublenden (abhängig vom state)
+  bool deleteState(value) {
+    if (value == true) {
+      _isDeleting = true;
+    } else {
+      _isDeleting = false;
+    }
+    notifyListeners();
+    return _isDeleting;
+  }
+
+  void loeschAuswahl(String value) {
+    if (!tickedForDeletion.contains(value)) {
+      tickedForDeletion.add(value);
+    } else {
+      tickedForDeletion.remove(value);
+    }
+    notifyListeners();
   }
 
   void _requestAppDocumentsDirectory() {                            // Funktion, die den Pfad des Ordners der App speichert
     _appDocumentsDirectory = getApplicationDocumentsDirectory();    // speichert einmalig den Pfad des Ordners der App in _appDocumentsDirectory
   }
 
-  
+  //wird nötig, wenn Notizen aus Speicher geladen werden sollen
   /*void loadNotizen() async {                                        // Funktion, die die Liste der Notizen neu lädt (wird bei Änderungen aufgerufen, um z.B. notizen_uebersicht.dart zu aktualisieren)
     final appDocumentsDirectory = await _appDocumentsDirectory;     // _appDocumentsDirectory muss in appDocumentsDirectory gespeichert werden, da _appDocumentsDirectory sonst nicht in der Funktion verwendet werden kann
     final files = appDocumentsDirectory!.listSync();                // Liste der Dateien im Ordner der App wird gespeichert
@@ -73,11 +97,14 @@ class MyAppState extends ChangeNotifier {
   }
 
   
-  void removeNotiz(String name) {
-    final filePath = '$_appDocumentsDirectory/$name.txt';
-    final file = File(filePath);
-    file.deleteSync();                                                                // .txt-Datei aus Pfad löschen
-    //notizenname.remove(name);                                                    // Notizname aus Liste der Notizen entfernen
+  void removeNotizen() {
+    for (String notizname in tickedForDeletion) {
+      notizenname.remove(notizname);
+      final filePath = '$_appDocumentsDirectory/$notizname.txt';
+      final file = File(filePath);
+      file.deleteSync();
+    }
+    tickedForDeletion.clear();
     notifyListeners();
   }
 }
@@ -109,11 +136,8 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
     case 1:
       page = NeueNotiz();                         //Neue Notiz anlegen und anschließend öffnen
       break;
-    case 2:
-      page = Placeholder();                       //wird Einstellungen Seite, noch ungenutzt
-      break;
     default:
-      throw UnimplementedError('no widget for $selectedIndex');       //Just in case
+      throw UnimplementedError('No widget for $selectedIndex');       //Just in case
     }
 
     var mainArea = ColoredBox(
@@ -141,10 +165,6 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
                     BottomNavigationBarItem(                          //Neue Notiz anlegen
                       icon: Icon(Icons.add_circle_outline),     
                       label: 'Neue Notiz',
-                    ),
-                    BottomNavigationBarItem(                          //Einstellungen
-                      icon: Icon(Icons.settings),     
-                      label: 'Einstellungen',
                     ),
                   ],
                   currentIndex: selectedIndex,       

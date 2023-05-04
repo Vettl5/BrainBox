@@ -47,39 +47,6 @@ class _NotizenState extends State<Notizen> {
 
     //Widget Listenelemente
 
-    Widget emptyListChecker = notizenname.isEmpty == true
-        ? Center(
-            child: Text('Keine Notizen vorhanden!'),
-          )
-        : ListView.builder(                                             //Auflistung der Notizen
-                shrinkWrap: true,
-                physics: BouncingScrollPhysics(),
-                itemCount: notizenname.length,
-                itemBuilder: (context, index) {
-                  return CheckboxListTile(
-                    leading: _isDeleting                              //Checkbox, um zu löschende Notizen auszuwählen
-                            ? Checkbox(                               //wenn _isDeleting true ist, wird Checkbox angezeigt
-                                checkColor: Colors.white, 
-                                fillColor: MaterialStateProperty.resolveWith(getColor), 
-                                value: _isChecked, 
-                                onChanged: (value) {
-                                  setState(() {
-                                    _isChecked = value!;
-                                  });
-                                },
-                              ) 
-                            : null,
-                    
-                    title: Text(notizenname[index]),
-                    onTap: () {
-                      //openAndEditFile(context, File(appState.notizen[index]));
-                    },
-                  );
-                },
-                //Divider();
-                
-              );
-
     /*--------------------------------------------------------LISTVIEW-----------------------------------------------------------*/
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
