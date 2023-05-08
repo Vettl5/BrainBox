@@ -43,26 +43,26 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 class MyAppState extends ChangeNotifier {
   Future<Directory?>? _appDocumentsDirectory;
-  List<String> notizenname = [];                                    // Liste der Notizen wird initialisiert, soll Namen speichern
-  bool _isDeleting = false;                                         // Checkboxen State (werden angezeigt oder nicht)
-  bool get isDeleting => _isDeleting;                               // public bool für widget_notizenliste.dart
-  List<String> tickedForDeletion = [];                              // zum löschen ausgewählte Notizen
+  String inhalt;
+  List<String> notes = [note(),];
+  bool isChecked;
+
+  Note({
+    required this.inhalt,
+    this.isChecked = false,
+  });
+
+
+  /*notiz ({
+    required this.inhalt,
+    required this._isChecked,
+    //bool get isChecked => _isChecked,                               // public bool für widget_notizenliste.dart
+    List<String> tickedForDeletion = [],                              // zum löschen ausgewählte Notizen
+  })*/
 
   MyAppState() {                                                    // Konstruktor für MyAppState, wird beim Start der App aufgerufen
     _requestAppDocumentsDirectory();                                
     //loadNotizen();                                                
-  }
-
-  //Übergabe _isDeleting von widget_appbar.dart an notizen_uebersicht.dart
-  //wird genutzt, um Checkboxen entweder anzuzeigen oder auszublenden (abhängig vom state)
-  bool deleteState(value) {
-    if (value == true) {
-      _isDeleting = true;
-    } else {
-      _isDeleting = false;
-    }
-    notifyListeners();
-    return _isDeleting;
   }
 
   void loeschAuswahl(String value) {
@@ -78,21 +78,11 @@ class MyAppState extends ChangeNotifier {
     _appDocumentsDirectory = getApplicationDocumentsDirectory();    // speichert einmalig den Pfad des Ordners der App in _appDocumentsDirectory
   }
 
-  //wird nötig, wenn Notizen aus Speicher geladen werden sollen
-  /*void loadNotizen() async {                                        // Funktion, die die Liste der Notizen neu lädt (wird bei Änderungen aufgerufen, um z.B. notizen_uebersicht.dart zu aktualisieren)
-    final appDocumentsDirectory = await _appDocumentsDirectory;     // _appDocumentsDirectory muss in appDocumentsDirectory gespeichert werden, da _appDocumentsDirectory sonst nicht in der Funktion verwendet werden kann
-    final files = appDocumentsDirectory!.listSync();                // Liste der Dateien im Ordner der App wird gespeichert
-    notizenname = files
-        .where((file) => file.path.endsWith('.txt'))                // Nur Dateien, die auf .txt enden, werden ausgewählt
-        .map((file) => file.path).toList();                         // Namen der Dateien werden zur Liste der Notizen hinzugefügt
-    notifyListeners();                                              // Listener wird benachrichtigt, dass die Notizen geladen wurden
-  }*/
-
   void addNotiz(String name) {                                                        // Funktion, die Notiz zur Liste hinzufügt
     /*final newFilePath = '$_appDocumentsDirectory/$name.txt';                          // Pfad der neuen .txt-Datei
     final newFile = File(newFilePath);                                                // Erzeugt Objekt vom Typ File im Pfad von newFilePath
     newFile.createSync(); */                                                            // legt neue .txt-Datei im Pfad von newFilePath an
-    notizenname.add(name);                                                            // Notizname zur Liste der Notizen hinzufügen
+    notiz.inhalt.add(name);                                                            // Notizname zur Liste der Notizen hinzufügen
     notifyListeners();
   }
 
@@ -110,8 +100,6 @@ class MyAppState extends ChangeNotifier {
 }
 
 /*----------------------------------------------------------------------------------------------------------*/
-
-
 //StatefulWidget nötig, da sich die Startseite entsprechend des selectedIndex ändert (Notizenübersicht, Neue Notiz, Einstellungen)
 
 class MyHomePage extends StatefulWidget {                           //Widget von MyHomePage (quasi gesamter Bildschirm)
@@ -183,3 +171,14 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
     );
   }
 }
+
+
+  //wird nötig, wenn Notizen aus Speicher geladen werden sollen
+  /*void loadNotizen() async {                                        // Funktion, die die Liste der Notizen neu lädt (wird bei Änderungen aufgerufen, um z.B. notizen_uebersicht.dart zu aktualisieren)
+    final appDocumentsDirectory = await _appDocumentsDirectory;     // _appDocumentsDirectory muss in appDocumentsDirectory gespeichert werden, da _appDocumentsDirectory sonst nicht in der Funktion verwendet werden kann
+    final files = appDocumentsDirectory!.listSync();                // Liste der Dateien im Ordner der App wird gespeichert
+    notizenname = files
+        .where((file) => file.path.endsWith('.txt'))                // Nur Dateien, die auf .txt enden, werden ausgewählt
+        .map((file) => file.path).toList();                         // Namen der Dateien werden zur Liste der Notizen hinzugefügt
+    notifyListeners();                                              // Listener wird benachrichtigt, dass die Notizen geladen wurden
+  }*/

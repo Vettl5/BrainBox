@@ -23,29 +23,13 @@ class _NotizenState extends State<Notizen> {
   
 
   /*----------------------------------APPBAR State Change Funktion, wird aktiviert wenn getriggert durch Optionsmenü-------------------------------------*/
-   @override
+  @override
   Widget build(BuildContext context) { 
     var appState = context.watch<MyAppState>();
     return buildNotizenListe(appState);                                     
   }
 
   Widget buildNotizenListe(MyAppState appState) {
-    List<String> notizenname = appState.notizenname;
-
-    /*--------------------------------------------------------Color setter für Checkboxen-----------------------------------------------------------*/
-    Color getColor(Set<MaterialState> states) {
-      const Set<MaterialState> interactiveStates = <MaterialState>{
-        MaterialState.pressed,
-        MaterialState.hovered,
-        MaterialState.focused,
-      };
-      if (states.any(interactiveStates.contains)) {
-        return Colors.blue;
-      }
-      return Colors.red;
-    }
-
-    //Widget Listenelemente
 
     /*--------------------------------------------------------LISTVIEW-----------------------------------------------------------*/
     return Scaffold(

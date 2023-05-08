@@ -19,35 +19,41 @@ class _NotizenListeState extends State<NotizenListe> {
   }
 
   Widget buildNotizenListe(MyAppState appState) {
-    List<String> notizenname = appState.notizenname;
-    bool isDeleting = appState.isDeleting;                          //Checkboxen State (übergeben von widget_appbar.dart an MyAppState)
-    bool isChecked = false;
+    List<String> notiz = appState.notiz.inhalt;
+    bool isChecked = appState.notiz.isChecked;
 
     Widget notizenListe = notizenname.isEmpty == true               //Wenn überhaupt gar keine Notizen vorhanden sind
         ? Center(
             child: Text('Keine Notizen vorhanden!'),
           )
-        : isDeleting == false
-          ? ListView.builder(                                       //Wenn "Notizen löschen" nicht aktiviert ist
+        : ListView.builder(                                       //Wenn "Notizen löschen" nicht aktiviert ist
                   shrinkWrap: true,
                   physics: BouncingScrollPhysics(),
-                  itemCount: notizenname.length,
+                  itemCount: notiz.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                        title: Text(
-                          notizenname[index],
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        onTap: () {
-                          Navigator.pushNamed(context, '/bearbeiten');
+                      leading: Checkbox(
+                        value: notiz[index].isChecked,
+                        onChanged: (value) {
+                          setState(() {
+                            notiz[index].isChecked = value!;
+                          });
                         },
+                      ),
+                      title: Text(
+                        notizenname[index],
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/bearbeiten');
+                      },
                     );
                   },
-                )
-          : ListView.builder(                                             //Wenn "Notizen löschen" ausgewählt wurde
+                );
+          /*: ListView.builder(                                             //Wenn "Notizen löschen" ausgewählt wurde
                 shrinkWrap: true,
                 physics: BouncingScrollPhysics(),
                 itemCount: notizenname.length,
@@ -72,7 +78,7 @@ class _NotizenListeState extends State<NotizenListe> {
                     controlAffinity: ListTileControlAffinity.leading,
                   );
                 },
-            );
+            );*/
     
     return notizenListe;
   }
