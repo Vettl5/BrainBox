@@ -32,14 +32,6 @@ class _NeueNotizState extends State<NeueNotiz> {
       if (_formKey.currentState!.validate()) {                                //Wenn Eingabe valide, dann
         final name = _nameController.text;
         if (name.isNotEmpty) {                                                //Wenn Eingabe nicht leer
-          if (appState.notizenname.contains(name)) {                          //Wenn Notiz bereits existiert, dann Fehlermeldung
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Tut mir leid, dieser Name existiert bereits!'),
-              ),
-            );
-            return;                                                           //Funktion wird beendet
-          } //sonst
           appState.addNotiz(name);                                            //Übergibt Namen der Notiz an addNotiz() in main.dart --> MyAppState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

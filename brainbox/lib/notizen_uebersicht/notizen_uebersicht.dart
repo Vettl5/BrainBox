@@ -18,6 +18,7 @@ class Notizen extends StatefulWidget {
 
 
 class _NotizenState extends State<Notizen> {
+  List notizen = [];                                             //Liste mit Notizen
   bool _isChecked = false;                                  //Checkboxen State (angetickt oder nicht)
   List<bool> _isCheckedList = [];                           //Liste der angetickten Notizen (if _isChecked true -> _isCheckedList true)
   

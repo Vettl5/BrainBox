@@ -42,28 +42,10 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 
 class MyAppState extends ChangeNotifier {
+  bool ausgewaehltZumLoeschen = false;
   Future<Directory?>? _appDocumentsDirectory;
-  String inhalt;
-  List<String> notes = [note(),];
-  bool isChecked;
-
-  Note({
-    required this.inhalt,
-    this.isChecked = false,
-  });
-
-
-  /*notiz ({
-    required this.inhalt,
-    required this._isChecked,
-    //bool get isChecked => _isChecked,                               // public bool für widget_notizenliste.dart
-    List<String> tickedForDeletion = [],                              // zum löschen ausgewählte Notizen
-  })*/
-
-  MyAppState() {                                                    // Konstruktor für MyAppState, wird beim Start der App aufgerufen
-    _requestAppDocumentsDirectory();                                
-    //loadNotizen();                                                
-  }
+  List<String> notiz = [];                                            //Liste der Notizen (inhalt)
+  List<String> zuletztgeloescht = [];
 
   void loeschAuswahl(String value) {
     if (!tickedForDeletion.contains(value)) {
@@ -74,15 +56,15 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _requestAppDocumentsDirectory() {                            // Funktion, die den Pfad des Ordners der App speichert
+  /*void _requestAppDocumentsDirectory() {                            // Funktion, die den Pfad des Ordners der App speichert
     _appDocumentsDirectory = getApplicationDocumentsDirectory();    // speichert einmalig den Pfad des Ordners der App in _appDocumentsDirectory
-  }
+  }*/
 
-  void addNotiz(String name) {                                                        // Funktion, die Notiz zur Liste hinzufügt
+  void addNotiz(String inhalt) {                                                        // Funktion, die Notiz zur Liste hinzufügt
     /*final newFilePath = '$_appDocumentsDirectory/$name.txt';                          // Pfad der neuen .txt-Datei
     final newFile = File(newFilePath);                                                // Erzeugt Objekt vom Typ File im Pfad von newFilePath
     newFile.createSync(); */                                                            // legt neue .txt-Datei im Pfad von newFilePath an
-    notiz.inhalt.add(name);                                                            // Notizname zur Liste der Notizen hinzufügen
+    notiz.inhalt.add(inhalt);                                                            // Notizname zur Liste der Notizen hinzufügen
     notifyListeners();
   }
 
