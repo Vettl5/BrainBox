@@ -1,14 +1,16 @@
 //import 'dart:io';
 //import 'package:path/path.dart';
-import 'dart:io';
-
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'dart:io';                                           
+import 'dart:convert';                                        // für json-Dateiarbeit                   
+import 'package:path_provider/path_provider.dart';            // um Dateispeicherort zu finden und nutzen
+import 'package:uuid/uuid.dart';                              // für id Generierung
+import 'package:flutter/material.dart';                       // für UI
+import 'package:provider/provider.dart';                      // für klassenübergreifenenden Zugriff auf Daten      
 
 import 'neue_notiz.dart';
 import 'notizen_bearbeiten.dart';
 import 'notizen_uebersicht/notizen_uebersicht.dart';
+import 'notizen_uebersicht/notiz_model_builder.dart';
 //import 'einstellungen.dart';
 
 /*----------------------------------------------------------------------------------------------------------*/
@@ -22,18 +24,18 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(                                //ein Widget, das die Daten an alle Widgets weitergibt
-      create: (context) => MyAppState(),                          //erstellt eine Instanz von MyAppState
+    return ChangeNotifierProvider(                                // ein Widget, das die Daten an alle Widgets weitergibt
+      create: (context) => MyAppState(),                          // erstellt eine Instanz von MyAppState
       child: MaterialApp(
         title: 'BrainBox',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 92, 124, 182)),
         ),
-        home: MyHomePage(),                                       //Startseite der App, leitet durch selectedIndex=0 zu Notizen() weiter
+        home: MyHomePage(),                                       // Startseite der App, leitet durch selectedIndex=0 zu Notizen() weiter
         routes: {
-          '/bearbeiten': (context) => NotizBearbeiten(),          //leitet zu NotizBearbeiten() weiter, wichtig für neue_notiz (Navigator.pushNamed...)
-          '/einstellungen':(context) => Placeholder(),          //leitet zu Einstellungen() weiter, wichtig für notizen_uebersicht (Navigator.pushNamed...)
+          '/bearbeiten': (context) => NotizBearbeiten(),          // leitet zu NotizBearbeiten() weiter, wichtig für neue_notiz (Navigator.pushNamed...)
+          '/einstellungen':(context) => Placeholder(),            // leitet zu Einstellungen() weiter, wichtig für notizen_uebersicht (Navigator.pushNamed...)
         },
       ),
     );
@@ -42,42 +44,72 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 
 class MyAppState extends ChangeNotifier {
-  bool ausgewaehltZumLoeschen = false;
-  Future<Directory?>? _appDocumentsDirectory;
-  List<String> notiz = [];                                            //Liste der Notizen (inhalt)
-  List<String> zuletztgeloescht = [];
+  bool isChecked = false;
+  List<dynamic> notiz = [];                          // Liste der Notizen (inhalt)
+  List<dynamic> zuletztgeloescht = [];
 
-  void loeschAuswahl(String value) {
-    if (!tickedForDeletion.contains(value)) {
-      tickedForDeletion.add(value);
-    } else {
-      tickedForDeletion.remove(value);
+  Future<void> ladenNotizen() async {
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/notizen.json');
+
+    if (await file.exists()) {
+      final jsonString = await file.readAsString();
+      final jsonList = json.decode(jsonString) as List<dynamic>;
+
+      notiz = jsonList.map((item) => NotizModel.fromJson(item)).toList();
+      //notiz = jsonList.map((item) => Map<String, dynamic>.from(item)).toList();
     }
-    notifyListeners();
+  } 
+  catch (e) {
+    print('Fehler beim Laden der Notizen: $e');
+  }
+}
+
+
+  Future<void> speichernNotizen() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/notizen.json');
+
+      final jsonList = notiz.map((item) => item.toJson()).toList();
+      final jsonString = json.encode(jsonList);
+
+      await file.writeAsString(jsonString);
+    } 
+    catch (e) {
+      print('Fehler beim Speichern der Notizen: $e');
+    }
   }
 
-  /*void _requestAppDocumentsDirectory() {                            // Funktion, die den Pfad des Ordners der App speichert
-    _appDocumentsDirectory = getApplicationDocumentsDirectory();    // speichert einmalig den Pfad des Ordners der App in _appDocumentsDirectory
-  }*/
 
-  void addNotiz(String inhalt) {                                                        // Funktion, die Notiz zur Liste hinzufügt
-    /*final newFilePath = '$_appDocumentsDirectory/$name.txt';                          // Pfad der neuen .txt-Datei
-    final newFile = File(newFilePath);                                                // Erzeugt Objekt vom Typ File im Pfad von newFilePath
-    newFile.createSync(); */                                                            // legt neue .txt-Datei im Pfad von newFilePath an
-    notiz.inhalt.add(inhalt);                                                            // Notizname zur Liste der Notizen hinzufügen
-    notifyListeners();
+  void hinzufuegenNotiz(String text) {
+    final id = Uuid().toString();
+    final notizmodel = NotizModel(id: id, text: text);
+    notiz.add(notizmodel);
+    speichernNotizen();
   }
 
-  
-  void removeNotizen() {
-    for (String notizname in tickedForDeletion) {
-      notizenname.remove(notizname);
-      final filePath = '$_appDocumentsDirectory/$notizname.txt';
-      final file = File(filePath);
-      file.deleteSync();
+  void aktualisierenNotiz(NotizModel notiz) {
+    speichernNotizen();
+  }
+
+  Future<void> notizLoeschen(NotizModel notizentext) await {
+    try {
+      notiz.remove(notizentext);
+      speichernNotizen();                             //speichernNotizen() wird aufgerufen, um notiz[] zu aktualisieren
+
+      final directory = getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/papierkorb.json');
+
+      final jsonList = zuletztgeloescht.map((item) => item.toJson()).toList();
+      final jsonString = json.encode(jsonList);
+      
+      await file.writeAsString(jsonString);
+    } 
+    catch (e) {
+      print('Fehler beim Löschen der Notiz: $e');
     }
-    tickedForDeletion.clear();
-    notifyListeners();
   }
 }
 

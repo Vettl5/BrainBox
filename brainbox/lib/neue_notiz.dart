@@ -30,17 +30,16 @@ class _NeueNotizState extends State<NeueNotiz> {
 
     void submitForm() {                                                       //Funktion, die die Notiz erstellt, speichert und öffnen veranlasst
       if (_formKey.currentState!.validate()) {                                //Wenn Eingabe valide, dann
-        final name = _nameController.text;
-        if (name.isNotEmpty) {                                                //Wenn Eingabe nicht leer
-          appState.addNotiz(name);                                            //Übergibt Namen der Notiz an addNotiz() in main.dart --> MyAppState
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Notiz erstellt!'),
-              duration: Duration(seconds: 2),
-            ),
-          );
-          //Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': name});   //Öffnet NotizBearbeiten() mit der erstellten Notiz
-        }
+        final text = _nameController.text;
+        appState.addNotiz(text);                                              //Übergibt Text der Notiz an addNotiz() in main.dart --> MyAppState
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Notiz erstellt!'),
+            duration: Duration(milliseconds: 1500),
+          ),
+        );
+        _nameController.clear();                                              // Eingabefeld leeren
+        //Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': name});   //Öffnet NotizBearbeiten() mit der erstellten Notiz; Erweiterungsoption
       }
     }
 

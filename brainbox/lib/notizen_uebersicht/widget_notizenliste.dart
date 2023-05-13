@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
-import 'notiz.dart';
+import 'notiz_model_builder.dart';
 
 /*----------------------------------NOTIZEN WIDGET GENERATOR-------------------------------------*/
  
@@ -21,7 +21,7 @@ class _NotizenListeState extends State<NotizenListe> {
   }
 
   Widget buildNotizenListe(MyAppState appState) {
-    List<String> notiz = appState.notiz;                     //Liste mit Notizen
+    List<Map<String, dynamic>> notiz = appState.notiz;                     //Liste mit Notizen
     
     Widget notizenListe = notiz.isEmpty == true               //Wenn überhaupt gar keine Notizen vorhanden sind
         ? Center(
