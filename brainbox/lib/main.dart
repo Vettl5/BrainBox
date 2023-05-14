@@ -50,15 +50,14 @@ class MyAppState extends ChangeNotifier {
 
   Future<void> ladenNotizen() async {
   try {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/notizen.json');
+    final directory = await getApplicationDocumentsDirectory();                     // Speicherort der App
+    final file = File('${directory.path}/notizen.json');                            // Datei, in der die Notizen gespeichert werden
 
     if (await file.exists()) {
-      final jsonString = await file.readAsString();
-      final jsonList = json.decode(jsonString) as List<dynamic>;
+      final jsonString = await file.readAsString();                                 // Dateiinhalt wird als String eingelesen & gespeichert
+      final jsonList = json.decode(jsonString) as List<dynamic>;                    // String wird in unformatierte Liste umgewandelt
 
-      notiz = jsonList.map((item) => NotizModel.fromJson(item)).toList();
-      //notiz = jsonList.map((item) => Map<String, dynamic>.from(item)).toList();
+      notiz = jsonList.map((item) => NotizModel.fromJson(item)).toList();           // Liste wird im NotizModel Format in notiz[] gespeichert
     }
   } 
   catch (e) {
@@ -72,6 +71,10 @@ class MyAppState extends ChangeNotifier {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/notizen.json');
 
+      if (await file.exists()) {
+        await file.delete();
+      }
+
       final jsonList = notiz.map((item) => item.toJson()).toList();
       final jsonString = json.encode(jsonList);
 
@@ -80,6 +83,7 @@ class MyAppState extends ChangeNotifier {
     catch (e) {
       print('Fehler beim Speichern der Notizen: $e');
     }
+    notifyListeners();
   }
 
 
@@ -88,28 +92,23 @@ class MyAppState extends ChangeNotifier {
     final notizmodel = NotizModel(id: id, text: text);
     notiz.add(notizmodel);
     speichernNotizen();
+    notifyListeners();
   }
 
-  void aktualisierenNotiz(NotizModel notiz) {
-    speichernNotizen();
-  }
-
-  Future<void> notizLoeschen(NotizModel notizentext) await {
-    try {
-      notiz.remove(notizentext);
-      speichernNotizen();                             //speichernNotizen() wird aufgerufen, um notiz[] zu aktualisieren
-
-      final directory = getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/papierkorb.json');
-
-      final jsonList = zuletztgeloescht.map((item) => item.toJson()).toList();
-      final jsonString = json.encode(jsonList);
-      
-      await file.writeAsString(jsonString);
-    } 
-    catch (e) {
-      print('Fehler beim Löschen der Notiz: $e');
+  void aktualisierenNotiz(String id, String newText) {
+    final foundIndex = notiz.indexWhere((item) => item.id == id);
+    if (foundIndex != -1) {
+      notiz[foundIndex].text = newText;
+      speichernNotizen();
+    } else {
+      print('Notiz mit ID $id nicht gefunden');
     }
+  }
+
+
+  void loeschenNotiz(String id) {
+    notiz.removeWhere((item) => item.id == id);
+    speichernNotizen();
   }
 }
 

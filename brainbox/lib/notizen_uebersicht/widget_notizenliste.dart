@@ -21,7 +21,7 @@ class _NotizenListeState extends State<NotizenListe> {
   }
 
   Widget buildNotizenListe(MyAppState appState) {
-    List<Map<String, dynamic>> notiz = appState.notiz;                     //Liste mit Notizen
+    List<dynamic> notiz = appState.notiz;                     //Liste mit Notizen
     
     Widget notizenListe = notiz.isEmpty == true               //Wenn überhaupt gar keine Notizen vorhanden sind
         ? Center(

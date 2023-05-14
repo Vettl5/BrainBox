@@ -20,8 +20,6 @@ class Notiz extends StatefulWidget {
 //-----------------------------------------------------------------------------------//
 
 class _NotizState extends State<Notiz> {
-  
-  
   //braucht man nur, wenn man Notizentext ändern will
   bool _isEditing = false;
   TextEditingController _controller = TextEditingController();
@@ -46,39 +44,54 @@ class _NotizState extends State<Notiz> {
         onChanged: (value) {
           setState(() {
             widget.notiz.isChecked = value ?? false;
-            appState.aktualisierenNotiz(widget.notiz);
+            appState.loeschenNotiz(widget.notiz.id);
           });
         },
-      )
+      ),
+      title: Text(
+        widget.notiz.text,
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      trailing: IconButton(
+        icon: Icon(Icons.edit),
+        onPressed: () {
+          setState(() {
+            _isEditing = true;
+          });
+        },
+      ),
     );
   }
 
-  Widget _buildEditing(MyAppState appState) {                             
-    return ListTile(
-      leading: IconButton(
-        icon: Icon(Icons.delete),                         
-        onPressed: () {
-          widget.onNotizDeleted(widget.notiz);
-        },
+  Widget _buildEditing(MyAppState appState) {
+  return ListTile(
+    title: TextFormField(
+      controller: _controller,
+      style: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
       ),
-      title: TextField(
-        controller: _controller,
-        autofocus: true,
-        onSubmitted: (value) {
-          setState(() {
-            widget.notiz.text = value;
-            widget.onNotizChanged(widget.notiz);
-            _isEditing = false;
-          });
-        },
-      ),
-    );
-  }
+    ),
+    trailing: IconButton(
+      icon: Icon(Icons.save),
+      onPressed: () {
+        setState(() {
+          widget.notiz.text = _controller.text;
+          _isEditing = false;
+          appState.aktualisierenNotiz(widget.notiz.id, widget.notiz.text);
+        });
+      },
+    ),
+  );
+}
 }
 
 class NotizModel {
   final String id;
-  final String text;
+  late String text;
   bool isChecked;
 
   NotizModel({

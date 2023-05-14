@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
-//import '../notizen_bearbeiten.dart';
 import 'widget_appbar.dart';
 import 'widget_notizenliste.dart';
 
@@ -19,7 +18,6 @@ class Notizen extends StatefulWidget {
 
 class _NotizenState extends State<Notizen> { 
 
-  /*----------------------------------APPBAR State Change Funktion, wird aktiviert wenn getriggert durch Optionsmenü-------------------------------------*/
   @override
   Widget build(BuildContext context) { 
     var appState = context.watch<MyAppState>();

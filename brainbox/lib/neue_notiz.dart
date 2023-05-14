@@ -31,7 +31,7 @@ class _NeueNotizState extends State<NeueNotiz> {
     void submitForm() {                                                       //Funktion, die die Notiz erstellt, speichert und öffnen veranlasst
       if (_formKey.currentState!.validate()) {                                //Wenn Eingabe valide, dann
         final text = _nameController.text;
-        appState.addNotiz(text);                                              //Übergibt Text der Notiz an addNotiz() in main.dart --> MyAppState
+        appState.hinzufuegenNotiz(text);                                              //Übergibt Text der Notiz an addNotiz() in main.dart --> MyAppState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Notiz erstellt!'),
