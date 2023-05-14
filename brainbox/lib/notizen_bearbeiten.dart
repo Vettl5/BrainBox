@@ -1,3 +1,7 @@
+// Als Erweiterungsmöglichkeit beibehalten
+// Wird nur benötigt, falls jedes ListTile in widget_notizenliste.dart eine eigene Seite zum Bearbeiten der Notiz bekommt
+// Momentan ist aber jedes ListTile die Notiz selbst und kein Dateititel
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 

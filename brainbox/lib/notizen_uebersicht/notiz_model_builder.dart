@@ -5,21 +5,20 @@ import '../main.dart';
 
 //------------------------notiz.dart soll Builder für eine Notiz darstellen------------------------//
 
-class Notiz extends StatefulWidget {
+class NotizModelBuilder extends StatefulWidget {
   final NotizModel notiz;
-
-  const Notiz({
+  const NotizModelBuilder({
     Key? key,
     required this.notiz,
   }) : super(key: key);
 
   @override
-  State<Notiz> createState() => _NotizState();
+  State<NotizModelBuilder> createState() => _NotizModBldState();
 }
 
 //-----------------------------------------------------------------------------------//
 
-class _NotizState extends State<Notiz> {
+class _NotizModBldState extends State<NotizModelBuilder> {
   //braucht man nur, wenn man Notizentext ändern will
   bool _isEditing = false;
   TextEditingController _controller = TextEditingController();
@@ -89,7 +88,7 @@ class _NotizState extends State<Notiz> {
 }
 }
 
-class NotizModel {
+class NotizModel {  // Struktur zum Abspeichern im Array Notiz (MyAppState) mit id, text und isChecked
   final String id;
   late String text;
   bool isChecked;

@@ -9,14 +9,14 @@ import 'widget_notizenliste.dart';
 
 /*-----------------------------------------------------NOTIZEN ÜBERSICHT----------------------------------------------------------*/
 
-class Notizen extends StatefulWidget {
-  const Notizen({super.key});
+class NotizenUebersicht extends StatefulWidget {
+  const NotizenUebersicht({super.key});
   @override
-  State<Notizen> createState() => _NotizenState();
+  State<NotizenUebersicht> createState() => _NotizenUebState();
 }
 
 
-class _NotizenState extends State<Notizen> { 
+class _NotizenUebState extends State<NotizenUebersicht> { 
 
   @override
   Widget build(BuildContext context) { 

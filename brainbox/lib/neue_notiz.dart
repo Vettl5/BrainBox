@@ -2,15 +2,10 @@
 // Input: Name der Notiz
 // Output: Neue Notiz wird erstellt
 
-//Libraries:
-//import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-//import 'package:path_provider/path_provider.dart';
 
-//Dateien:
 import 'main.dart';
-//import 'notizen_bearbeiten.dart';
 //---------------------------------------------------------------------------------------------------------------
 
 //Klassen:
@@ -39,7 +34,6 @@ class _NeueNotizState extends State<NeueNotiz> {
           ),
         );
         _nameController.clear();                                              // Eingabefeld leeren
-        //Navigator.pushNamed(context, '/bearbeiten', arguments: {'file': name});   //Öffnet NotizBearbeiten() mit der erstellten Notiz; Erweiterungsoption
       }
     }
 

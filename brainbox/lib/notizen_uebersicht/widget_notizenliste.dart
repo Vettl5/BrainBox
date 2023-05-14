@@ -21,6 +21,7 @@ class _NotizenListeState extends State<NotizenListe> {
   }
 
   Widget buildNotizenListe(MyAppState appState) {
+    appState.ladenNotizen();
     List<dynamic> notiz = appState.notiz;                     //Liste mit Notizen
     
     Widget notizenListe = notiz.isEmpty == true               //Wenn überhaupt gar keine Notizen vorhanden sind
@@ -28,24 +29,16 @@ class _NotizenListeState extends State<NotizenListe> {
             child: Text('Keine Notizen vorhanden!'),
           )
         : ListView.builder(                                         //Notizen mit runder Checkbox davor anzeigen
-                  shrinkWrap: true,
-                  physics: BouncingScrollPhysics(),
-                  itemCount: notiz.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(
-                        notiz[index],                 //evtl notiz.text[index], muss dann entsprechend in MyAppState geändert werden
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/bearbeiten');
-                      },
-                    );
-                  },
-                );
+            shrinkWrap: true,
+            physics: BouncingScrollPhysics(),
+            itemCount: notiz.length,
+            itemBuilder: (context, index) {
+              NotizModel currentNotiz = notiz[index];
+              return NotizModelBuilder(
+                notiz: currentNotiz,
+              );
+            },
+          );
     
     return notizenListe;
   }

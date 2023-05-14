@@ -44,26 +44,27 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 
 class MyAppState extends ChangeNotifier {
-  bool isChecked = false;
   List<dynamic> notiz = [];                          // Liste der Notizen (inhalt)
   List<dynamic> zuletztgeloescht = [];
+  final Uuid uuid = Uuid();
 
   Future<void> ladenNotizen() async {
-  try {
-    final directory = await getApplicationDocumentsDirectory();                     // Speicherort der App
-    final file = File('${directory.path}/notizen.json');                            // Datei, in der die Notizen gespeichert werden
+    try {
+      final directory = await getApplicationDocumentsDirectory();                     // Speicherort der App
+      final file = File('${directory.path}/notizen.json');                            // Datei, in der die Notizen gespeichert werden
 
-    if (await file.exists()) {
-      final jsonString = await file.readAsString();                                 // Dateiinhalt wird als String eingelesen & gespeichert
-      final jsonList = json.decode(jsonString) as List<dynamic>;                    // String wird in unformatierte Liste umgewandelt
+      if (await file.exists()) {
+        final jsonString = await file.readAsString();                                 // Dateiinhalt wird als String eingelesen & gespeichert
+        final jsonList = json.decode(jsonString) as List<dynamic>;                    // String wird in unformatierte Liste umgewandelt
 
-      notiz = jsonList.map((item) => NotizModel.fromJson(item)).toList();           // Liste wird im NotizModel Format in notiz[] gespeichert
+        notiz = jsonList.map((item) => NotizModel.fromJson(item)).toList();           // Liste wird im NotizModel Format in notiz[] gespeichert
+      }
+    } 
+    catch (e) {
+      print('Fehler beim Laden der Notizen: $e');
     }
-  } 
-  catch (e) {
-    print('Fehler beim Laden der Notizen: $e');
+    notifyListeners();
   }
-}
 
 
   Future<void> speichernNotizen() async {
@@ -71,9 +72,9 @@ class MyAppState extends ChangeNotifier {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/notizen.json');
 
-      if (await file.exists()) {
+      /*if (await file.exists()) {
         await file.delete();
-      }
+      }*/
 
       final jsonList = notiz.map((item) => item.toJson()).toList();
       final jsonString = json.encode(jsonList);
@@ -88,11 +89,10 @@ class MyAppState extends ChangeNotifier {
 
 
   void hinzufuegenNotiz(String text) {
-    final id = Uuid().toString();
-    final notizmodel = NotizModel(id: id, text: text);
-    notiz.add(notizmodel);
-    speichernNotizen();
-    notifyListeners();
+    final notizmodel = NotizModel(id: uuid.v4(), text: text);       // Erstellt eine Instanz von NotizModel; übergibt id und text, isChecked kommt von NotizModel selbst
+    notiz.add(notizmodel);                                          // Notiz in Daten-Modell Form wird in Liste notiz[] gespeichert
+    speichernNotizen();                                             // aktueller Listeninhalt von notiz[] wird in neuer JSON Datei gespeichert
+    notifyListeners();                                              // informiert alle Widgets, dass sich die Daten geändert haben
   }
 
   void aktualisierenNotiz(String id, String newText) {
@@ -103,11 +103,19 @@ class MyAppState extends ChangeNotifier {
     } else {
       print('Notiz mit ID $id nicht gefunden');
     }
+    notifyListeners();
   }
 
 
   void loeschenNotiz(String id) {
-    notiz.removeWhere((item) => item.id == id);
+    // isChecked für Notiz mit betreffender ID auf true setzen
+    final foundIndex = notiz.indexWhere((item) => item.id == id);
+    if (foundIndex != -1) {
+      notiz[foundIndex].isChecked = true;
+    }
+
+    // Notizen aus Liste "notiz" entfernen, bei denen isChecked true ist
+    notiz.removeWhere((item) => item.isChecked = true);
     speichernNotizen();
   }
 }
@@ -132,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
     Widget page;
     switch (selectedIndex) {
     case 0:
-      page = Notizen();                           //Notizenübersicht, Startseite
+      page = NotizenUebersicht();                           //Notizenübersicht, Startseite
       break;
     case 1:
       page = NeueNotiz();                         //Neue Notiz anlegen und anschließend öffnen
