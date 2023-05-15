@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
-import 'papierkorb_model_builder.dart';
+import 'notiz_model_builder.dart';
 
 /*----------------------------------NOTIZEN WIDGET GENERATOR-------------------------------------*/
  
@@ -47,9 +47,9 @@ class _PapierkorbListeState extends State<PapierkorbListe> {
             physics: BouncingScrollPhysics(),
             itemCount: papierkorb.length,
             itemBuilder: (context, index) {
-              PapierkorbModel currentNotiz = papierkorb[index];
-              return PapierkorbModelBuilder(
-                muell: currentNotiz,                            // Übergabe vo Listenelement an NotizModelBuilder
+              NotizModel currentNotiz = papierkorb[index];
+              return NotizModelBuilder(
+                notiz: currentNotiz,                            // Übergabe vo Listenelement an NotizModelBuilder
               );
             },
           );

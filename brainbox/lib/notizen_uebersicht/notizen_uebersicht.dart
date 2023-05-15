@@ -4,13 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
-import 'widget_appbar.dart';
 import 'widget_notizenliste.dart';
 
 /*-----------------------------------------------------NOTIZEN ÜBERSICHT----------------------------------------------------------*/
 
 class NotizenUebersicht extends StatefulWidget {
-  const NotizenUebersicht({super.key});
+  final Function(int) onToggleIndex;
+
+  NotizenUebersicht({
+    Key? key, 
+    required this.onToggleIndex,}) : super(key: key);
   @override
   State<NotizenUebersicht> createState() => _NotizenUebState();
 }
@@ -32,13 +35,49 @@ class _NotizenUebState extends State<NotizenUebersicht> {
         builder: (context, constraints) {
           return Column(
             children: [
-              MyAppBar(),                         //Generierung der AppBar(abhängig von _isDeleting)
+              AppBar(
+                title: const Text('BrainBox', 
+                  style: TextStyle(
+                    fontSize: 30, 
+                    fontWeight: FontWeight.bold, 
+                    color: Colors.white,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                actions: [
+                  IconButton(                                                                     //Optionmenü Button
+                    icon: const Icon(Icons.more_vert, size: 30, color: Colors.white),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return SizedBox(
+                            height: 200,
+                            child: Column(
+                              children: [
+                                //Papierkorb öffnen:
+                                ListTile(
+                                  leading: Icon(Icons.delete),
+                                  title: Text('Gelöschte Notizen wiederherstellen'),
+                                  onTap: () {
+                                    widget.onToggleIndex(1);    // Aufruf der Callback-Funktion
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  )
+                ],
+              ),
               NotizenListe(),                     //Generierung der Notizenliste
             ],
           );
         },
       ),
     );
-
   }
 }

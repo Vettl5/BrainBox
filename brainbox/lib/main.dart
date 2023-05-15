@@ -1,18 +1,15 @@
-//import 'dart:io';
-//import 'package:path/path.dart';
 import 'dart:io';                                           
 import 'dart:convert';                                        // für json-Dateiarbeit                   
 import 'package:path_provider/path_provider.dart';            // um Dateispeicherort zu finden und nutzen
 import 'package:uuid/uuid.dart';                              // für id Generierung
 import 'package:flutter/material.dart';                       // für UI
-import 'package:provider/provider.dart';                      // für klassenübergreifenenden Zugriff auf Daten      
+import 'package:provider/provider.dart';                      // für klassenübergreifenenden Zugriff auf Daten 
+//import 'package:shared_preferences/shared_preferences.dart'; // für dauerhafte Speicherung von Daten     
 
 import 'neue_notiz.dart';
-import 'notizen_bearbeiten.dart';
-import 'notizen_uebersicht/papierkorb_uebersicht.dart';
-import 'notizen_uebersicht/notizen_uebersicht.dart';
+import 'notizen_oder_papierkorb_laden.dart';
 import 'notizen_uebersicht/notiz_model_builder.dart';
-//import 'einstellungen.dart';
+import 'notizen_uebersicht/papierkorb_model_builder.dart';
 
 /*----------------------------------------------------------------------------------------------------------*/
 
@@ -35,8 +32,8 @@ class MyApp extends StatelessWidget {                             //Definiert ei
         ),
         home: MyHomePage(),                                       // Startseite der App, leitet durch selectedIndex=0 zu Notizen() weiter
         routes: {
-          '/bearbeiten': (context) => NotizBearbeiten(),          // leitet zu NotizBearbeiten() weiter, wichtig für neue_notiz (Navigator.pushNamed...)
-          '/papierkorb':(context) => PapierkorbUebersicht(),            // leitet zu Einstellungen() weiter, wichtig für notizen_uebersicht (Navigator.pushNamed...)
+          //'/notizen': (context) => NotizenUebersicht(),          // leitet zu NotizBearbeiten() weiter, wichtig für neue_notiz (Navigator.pushNamed...)
+          //'/papierkorb':(context) => PapierkorbUebersicht(),            // leitet zu Einstellungen() weiter, wichtig für notizen_uebersicht (Navigator.pushNamed...)
         },
       ),
     );
@@ -45,72 +42,86 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 
 class MyAppState extends ChangeNotifier {
-  List<dynamic> notiz = [];                          // Liste der Notizen (inhalt)
-  List<dynamic> zuletztgeloescht = [];
+  List<dynamic> notiz = <NotizModel>[];                          // Liste der Notizen (inhalt)
+  List<dynamic> zuletztgeloescht = <NotizModel>[];
   final Uuid uuid = Uuid();
 
-  Future<void> ladenNotizen() async {
-    speichernNotizen();                                                               /* vor jedem Laden (Notizenübersicht Aufruf) soll Notizen-JSON neu erstellt werden, 
-                                                                                      um Inhalt zu aktualisieren nach evlt. Löschvorgang und gelöschte Notizen zu entfernen*/
-    try {
-      final directory = await getApplicationDocumentsDirectory();                     // Speicherort der App
-      final file = File('${directory.path}/notizen.json');                            // Datei, in der die Notizen gespeichert werden
+  /*--------------------------------------------Notizen--------------------------------------------------------------*/
+  Future<void> checkIfNotizExists() async {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/notizen.json');
 
       if (await file.exists()) {
-        final jsonString = await file.readAsString();                                 // Dateiinhalt wird als String eingelesen & gespeichert
-        final jsonList = json.decode(jsonString) as List<dynamic>;                    // String wird in unformatierte Liste umgewandelt
-
-        notiz = jsonList.map((item) => NotizModel.fromJson(item)).toList();           // Liste wird im NotizModel Format in notiz[] gespeichert
+        ladenNotizen();
+      } else {
+        initialisiereNotizen();
       }
-    } 
-    catch (e) {
-      print('Fehler beim Laden der Notizen: $e');
-    }
-    notifyListeners();
   }
 
-
-  Future<void> speichernNotizen() async {
+  //wenn Notizdatei bereits existiert, lade Notizen
+  Future<void> ladenNotizen() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/notizen.json');
 
       if (await file.exists()) {
-        await file.delete();
+        final jsonString = await file.readAsString();
+        final jsonList = json.decode(jsonString) as List<dynamic>;
+        notiz = jsonList.map((item) => NotizModel.fromJson(item)).toList();
       }
-
-      final jsonList = notiz.map((item) => item.toJson()).toList();
-      final jsonString = json.encode(jsonList);
-
-      await file.writeAsString(jsonString);
-    } 
-    catch (e) {
-      print('Fehler beim Speichern der Notizen: $e');
+    } catch (e) {
+      print('Fehler beim Laden der Notizen: $e');
     }
     notifyListeners();
   }
 
-
-  Future<void> speichernPapierkorb() async {
+  //wenn Notizdatei noch nicht existiert, erstelle Notizdatei
+  Future<void> initialisiereNotizen() async {
     try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/notizen.json');
+
+      if (!await file.exists()) {
+        final jsonString = json.encode(notiz);
+        await file.writeAsString(jsonString);
+      }
+    } catch (e) {
+      print('Fehler beim Initialisieren der Notizen: $e');
+    }
+  }
+
+  //Funktion soll notiz[] auslesen und JSON Datei aktualisieren
+  Future<void> speichereNotizen() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/notizen.json');
+
+      /*alt:
+      //final jsonList = notiz.map((item) => item.toJson()).toList();*/
+
+      //lese Array (in NotizModel Format, s.o.) aus & konvertiere es in eine Liste, verschlüssel die Liste im json Format
+      final jsonString = json.encode(notiz.toList());
+
+      //aktualisiere die Datei, indem verschlüsselte Liste als String in Datei geschrieben wird
+      await file.writeAsString(jsonString);
+    } catch (e) {
+      print('Fehler beim Speichern der Notizen: $e');
+    }
+  }
+
+  /*--------------------------------------------Papierkorb------------------------------------------------------------*/
+  Future<void> checkIfPapierkorbExists() async {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/papierkorb.json');
 
       if (await file.exists()) {
-        await file.delete();
+        ladenPapierkorb();
+      } else {
+        initialisierePapierkorb();
       }
-
-      final jsonList = zuletztgeloescht.map((item) => item.toJson()).toList();
-      final jsonString = json.encode(jsonList);
-
-      await file.writeAsString(jsonString);
-    } 
-    catch (e) {
-      print('Fehler beim Speichern des Papierkorbs: $e');
-    }
   }
 
-  //ist noch nicht in Aktivcode eingebunden
+  //wenn Notizdatei bereits existiert, lade Notizen
   Future<void> ladenPapierkorb() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
@@ -119,20 +130,52 @@ class MyAppState extends ChangeNotifier {
       if (await file.exists()) {
         final jsonString = await file.readAsString();
         final jsonList = json.decode(jsonString) as List<dynamic>;
-
         zuletztgeloescht = jsonList.map((item) => NotizModel.fromJson(item)).toList();
       }
-    } 
-    catch (e) {
+    } catch (e) {
       print('Fehler beim Laden des Papierkorbs: $e');
+    }
+    notifyListeners();
+  }
+
+  //wenn Notizdatei noch nicht existiert, erstelle Notizdatei
+  Future<void> initialisierePapierkorb() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/papierkorb.json');
+
+      if (!await file.exists()) {
+        final jsonString = json.encode(zuletztgeloescht);
+        await file.writeAsString(jsonString);
+      }
+    } catch (e) {
+      print('Fehler beim Initialisieren des Papierkorbs: $e');
     }
   }
 
+  Future<void> speicherePapierkorb() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/papierkorb.json');
 
+      //lese Array (in NotizModel Format, s.o.) aus & konvertiere es in eine Liste, verschlüssel die Liste im json Format
+      final jsonString = json.encode(zuletztgeloescht.toList());
+
+      //aktualisiere die Datei, indem verschlüsselte Liste als String in Datei geschrieben wird
+      await file.writeAsString(jsonString);
+    } catch (e) {
+      print('Fehler beim Speichern des Papierkorbs: $e');
+    }
+  }
+
+  /*--------------------------------------------Dateiarbeit Funktionen------------------------------------------------------------*/
   void hinzufuegenNotiz(String text) {
+    if(notiz.isEmpty) {                                             // falls Notiz hinzugefügt werden soll, aber Liste notiz[] noch leer ist
+        initialisiereNotizen();
+    }
     final notizmodel = NotizModel(id: uuid.v4(), text: text);       // Erstellt eine Instanz von NotizModel; übergibt id und text, isChecked kommt von NotizModel selbst
     notiz.add(notizmodel);                                          // Notiz in Daten-Modell Form wird in Liste notiz[] gespeichert
-    speichernNotizen();                                             // aktueller Listeninhalt von notiz[] wird in neuer JSON Datei gespeichert
+    speichereNotizen();                                             // aktueller Listeninhalt von notiz[] wird in neuer JSON Datei gespeichert
     notifyListeners();                                              // informiert alle Widgets, dass sich die Daten geändert haben
   }
 
@@ -140,9 +183,9 @@ class MyAppState extends ChangeNotifier {
     final foundIndex = notiz.indexWhere((item) => item.id == id);
     if (foundIndex != -1) {
       notiz[foundIndex].text = newText;
-      speichernNotizen();
+      speichereNotizen();
     } else {
-      print('Notiz mit ID $id nicht gefunden');
+      print('Notiz konnte nicht aktualisiert werden: ID $id nicht gefunden');
     }
     notifyListeners();
   }
@@ -151,9 +194,9 @@ class MyAppState extends ChangeNotifier {
     final foundIndex = notiz.indexWhere((item) => item.id == id);
     if (foundIndex != -1) {
       zuletztgeloescht.add(notiz[foundIndex]);
-      speichernPapierkorb();
+      speicherePapierkorb();
     } else {
-      print('Notiz mit ID $id nicht gefunden');
+      print('Notiz konnte nicht Papierkorb hinzugefügt werden: ID $id nicht gefunden');
     }
   }
 
@@ -161,8 +204,8 @@ class MyAppState extends ChangeNotifier {
   void loeschenNotiz(String id) {
     hinzufuegenPapierkorb(id);                                      // zu löschende Notiz wird zuerst in Papierkorb übertragen
     // Notizen aus Liste "notiz" entfernen, bei denen isChecked true ist
-    notiz.removeWhere((item) => item.isChecked = true);
-    speichernPapierkorb();                                          // zum Löschen ausgewählte Notiz wird zuerst in Papierkorb übertragen
+    notiz.removeWhere((item) => item.id == id);
+    //speicherePapierkorb();                                          // zum Löschen ausgewählte Notiz wird zuerst in Papierkorb übertragen
   }                                                                 // erst bei nächstem Notizenübersicht() Aufruf wird die Notiz aus notiz[] gelöscht
 
 
@@ -170,7 +213,7 @@ class MyAppState extends ChangeNotifier {
     final foundIndex = zuletztgeloescht.indexWhere((item) => item.id == id);
     if (foundIndex != -1) {
       notiz.add(zuletztgeloescht[foundIndex]);
-      speichernNotizen();
+      speichereNotizen();
     } else {
       print('Notiz mit ID $id nicht gefunden');
     }
@@ -197,7 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
     Widget page;
     switch (selectedIndex) {
     case 0:
-      page = NotizenUebersicht();                           //Notizenübersicht, Startseite
+      page = NotizenOderPapierkorb();                           //Notizenübersicht, Startseite
       break;
     case 1:
       page = NeueNotiz();                         //Neue Notiz anlegen und anschließend öffnen
