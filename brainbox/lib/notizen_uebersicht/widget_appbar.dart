@@ -46,10 +46,10 @@ class _AppBarState extends State<MyAppBar> {
                             //Einstellungen öffnen:
                             ListTile(
                               leading: Icon(Icons.settings),
-                              title: Text('Einstellungen'),           //Option #2
+                              title: Text('Gelöschte Notizen'),
                               onTap: () {
                                 Navigator.pop(context);
-                                Navigator.pushNamed(context, '/einstellungen');
+                                Navigator.pushNamed(context, '/');
                               },
                             ),
                           ],

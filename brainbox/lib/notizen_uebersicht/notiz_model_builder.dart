@@ -21,6 +21,7 @@ class NotizModelBuilder extends StatefulWidget {
 class _NotizModBldState extends State<NotizModelBuilder> {
   //braucht man nur, wenn man Notizentext ändern will
   bool _isEditing = false;
+  bool _isChecked = false;
   TextEditingController _controller = TextEditingController();
 
   // Anzeigetext der Notiz eig. TextEditingController mit Notiztext als Default; Bearbeitungsmöglichkeit!
@@ -37,22 +38,32 @@ class _NotizModBldState extends State<NotizModelBuilder> {
   }
 
   Widget _buildNotEditing(MyAppState appState) {
+
+    TextStyle textStyle = TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+    );
+
+    if (_isChecked) {
+      textStyle = textStyle.copyWith(
+        decoration: TextDecoration.lineThrough,
+        color: Colors.grey,
+      );
+    }
+
     return ListTile(
       leading: Checkbox(
-        value: widget.notiz.isChecked,
+        value: _isChecked,
         onChanged: (value) {
           setState(() {
-            widget.notiz.isChecked = value ?? false;
+            _isChecked = value ?? false;
             appState.loeschenNotiz(widget.notiz.id);
           });
         },
       ),
       title: Text(
         widget.notiz.text,
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
+        style: textStyle,
       ),
       trailing: IconButton(
         icon: Icon(Icons.edit),
@@ -91,19 +102,16 @@ class _NotizModBldState extends State<NotizModelBuilder> {
 class NotizModel {  // Struktur zum Abspeichern im Array Notiz (MyAppState) mit id, text und isChecked
   final String id;
   late String text;
-  bool isChecked;
 
   NotizModel({
     required this.id,
     required this.text,
-    this.isChecked = false,
   });
 
   factory NotizModel.fromJson(Map<String, dynamic> json) {
     return NotizModel(
       id: json['id'],
       text: json['text'],
-      isChecked: json['isChecked'] ?? false,
     );
   }
 
@@ -111,7 +119,6 @@ class NotizModel {  // Struktur zum Abspeichern im Array Notiz (MyAppState) mit 
     return {
       'id': id,
       'text': text,
-      'isChecked': isChecked,
     };
   }
 }

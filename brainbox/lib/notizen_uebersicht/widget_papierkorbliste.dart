@@ -2,29 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
-import 'notiz_model_builder.dart';
+import 'papierkorb_model_builder.dart';
 
 /*----------------------------------NOTIZEN WIDGET GENERATOR-------------------------------------*/
  
 
-class NotizenListe extends StatefulWidget {
-  const NotizenListe({super.key});
+class PapierkorbListe extends StatefulWidget {
+  const PapierkorbListe({super.key});
   @override
-  State<NotizenListe> createState() => _NotizenListeState();
+  State<PapierkorbListe> createState() => _PapierkorbListeState();
 }
 
-class _NotizenListeState extends State<NotizenListe> {
+class _PapierkorbListeState extends State<PapierkorbListe> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    return buildNotizenListe(appState);                                     
+    return buildPapierkorbListe(appState);                                     
   }
 
-  Widget buildNotizenListe(MyAppState appState) {
-    appState.ladenNotizen();
-    List<dynamic> notiz = appState.notiz;                     //Liste mit Notizen
+  Widget buildPapierkorbListe(MyAppState appState) {
+    appState.ladenPapierkorb();
+    List<dynamic> notiz = appState.zuletztgeloescht;            //Liste mit Notizen
     
-    Widget notizenListe = notiz.isEmpty == true               //Wenn überhaupt gar keine Notizen vorhanden sind
+    Widget papierkorbListe = notiz.isEmpty == true                 //Wenn überhaupt gar keine Notizen vorhanden sind
         ? SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
             child: Column(
@@ -32,7 +32,7 @@ class _NotizenListeState extends State<NotizenListe> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  "Keine Notizen vorhanden!",
+                  "Keine gelöschten Notizen vorhanden!",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20,
@@ -47,8 +47,8 @@ class _NotizenListeState extends State<NotizenListe> {
             physics: BouncingScrollPhysics(),
             itemCount: notiz.length,
             itemBuilder: (context, index) {
-              NotizModel currentNotiz = notiz[index];
-              return NotizModelBuilder(
+              PapierkorbModel currentNotiz = notiz[index];
+              return PapierkorbModelBuilder(
                 notiz: currentNotiz,                            // Übergabe vo Listenelement an NotizModelBuilder
               );
             },

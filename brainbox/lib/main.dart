@@ -49,6 +49,8 @@ class MyAppState extends ChangeNotifier {
   final Uuid uuid = Uuid();
 
   Future<void> ladenNotizen() async {
+    speichernNotizen();                                                               /* vor jedem Laden (Notizenübersicht Aufruf) soll Notizen-JSON neu erstellt werden, 
+                                                                                      um Inhalt zu aktualisieren nach evlt. Löschvorgang und gelöschte Notizen zu entfernen*/
     try {
       final directory = await getApplicationDocumentsDirectory();                     // Speicherort der App
       final file = File('${directory.path}/notizen.json');                            // Datei, in der die Notizen gespeichert werden
@@ -72,9 +74,9 @@ class MyAppState extends ChangeNotifier {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/notizen.json');
 
-      /*if (await file.exists()) {
+      if (await file.exists()) {
         await file.delete();
-      }*/
+      }
 
       final jsonList = notiz.map((item) => item.toJson()).toList();
       final jsonString = json.encode(jsonList);
@@ -85,6 +87,44 @@ class MyAppState extends ChangeNotifier {
       print('Fehler beim Speichern der Notizen: $e');
     }
     notifyListeners();
+  }
+
+
+  Future<void> speichernPapierkorb() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/papierkorb.json');
+
+      if (await file.exists()) {
+        await file.delete();
+      }
+
+      final jsonList = zuletztgeloescht.map((item) => item.toJson()).toList();
+      final jsonString = json.encode(jsonList);
+
+      await file.writeAsString(jsonString);
+    } 
+    catch (e) {
+      print('Fehler beim Speichern des Papierkorbs: $e');
+    }
+  }
+
+  //ist noch nicht in Aktivcode eingebunden
+  Future<void> ladenPapierkorb() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/papierkorb.json');
+
+      if (await file.exists()) {
+        final jsonString = await file.readAsString();
+        final jsonList = json.decode(jsonString) as List<dynamic>;
+
+        zuletztgeloescht = jsonList.map((item) => NotizModel.fromJson(item)).toList();
+      }
+    } 
+    catch (e) {
+      print('Fehler beim Laden des Papierkorbs: $e');
+    }
   }
 
 
@@ -106,17 +146,33 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-
-  void loeschenNotiz(String id) {
-    // isChecked für Notiz mit betreffender ID auf true setzen
+  void hinzufuegenPapierkorb(String id) {
     final foundIndex = notiz.indexWhere((item) => item.id == id);
     if (foundIndex != -1) {
-      notiz[foundIndex].isChecked = true;
+      zuletztgeloescht.add(notiz[foundIndex]);
+      speichernPapierkorb();
+    } else {
+      print('Notiz mit ID $id nicht gefunden');
     }
+  }
 
+
+  void loeschenNotiz(String id) {
+    hinzufuegenPapierkorb(id);                                      // zu löschende Notiz wird zuerst in Papierkorb übertragen
     // Notizen aus Liste "notiz" entfernen, bei denen isChecked true ist
     notiz.removeWhere((item) => item.isChecked = true);
-    speichernNotizen();
+    speichernPapierkorb();                                          // zum Löschen ausgewählte Notiz wird zuerst in Papierkorb übertragen
+  }                                                                 // erst bei nächstem Notizenübersicht() Aufruf wird die Notiz aus notiz[] gelöscht
+
+
+  void rueckgaengigPapierkorb() {
+    final foundIndex = zuletztgeloescht.indexWhere((item) => item.id == id);
+    if (foundIndex != -1) {
+      notiz.add(zuletztgeloescht[foundIndex]);
+      speichernNotizen();
+    } else {
+      print('Notiz mit ID $id nicht gefunden');
+    }
   }
 }
 

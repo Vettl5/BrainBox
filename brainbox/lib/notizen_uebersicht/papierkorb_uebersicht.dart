@@ -5,26 +5,26 @@ import 'package:provider/provider.dart';
 
 import '../main.dart';
 import 'widget_appbar.dart';
-import 'widget_notizenliste.dart';
+import 'widget_papierkorbliste.dart';
 
 /*-----------------------------------------------------NOTIZEN ÜBERSICHT----------------------------------------------------------*/
 
-class NotizenUebersicht extends StatefulWidget {
-  const NotizenUebersicht({super.key});
+class PapierkorbUebersicht extends StatefulWidget {
+  const PapierkorbUebersicht({super.key});
   @override
-  State<NotizenUebersicht> createState() => _NotizenUebState();
+  State<PapierkorbUebersicht> createState() => _PapierkorbUebState();
 }
 
 
-class _NotizenUebState extends State<NotizenUebersicht> { 
+class _PapierkorbUebState extends State<PapierkorbUebersicht> { 
 
   @override
   Widget build(BuildContext context) { 
     var appState = context.watch<MyAppState>();
-    return buildNotizenListe(appState);                                     
+    return buildPapierkorbListe(appState);                                     
   }
 
-  Widget buildNotizenListe(MyAppState appState) {
+  Widget buildPapierkorbListe(MyAppState appState) {
     /*--------------------------------------------------------LISTVIEW-----------------------------------------------------------*/
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -33,7 +33,7 @@ class _NotizenUebState extends State<NotizenUebersicht> {
           return Column(
             children: [
               MyAppBar(),                         //Generierung der AppBar(abhängig von _isDeleting)
-              NotizenListe(),                     //Generierung der Notizenliste
+              PapierkorbListe(),                     //Generierung der Notizenliste
             ],
           );
         },
