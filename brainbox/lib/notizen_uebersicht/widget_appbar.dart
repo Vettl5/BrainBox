@@ -43,13 +43,13 @@ class _AppBarState extends State<MyAppBar> {
                         height: 200,
                         child: Column(
                           children: [
-                            //Einstellungen öffnen:
+                            //Papierkorb öffnen:
                             ListTile(
                               leading: Icon(Icons.settings),
                               title: Text('Gelöschte Notizen'),
                               onTap: () {
                                 Navigator.pop(context);
-                                Navigator.pushNamed(context, '/');
+                                Navigator.pushNamed(context, '/papierkorb');
                               },
                             ),
                           ],

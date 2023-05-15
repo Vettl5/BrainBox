@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';                      // für klassenüb
 
 import 'neue_notiz.dart';
 import 'notizen_bearbeiten.dart';
+import 'notizen_uebersicht/papierkorb_uebersicht.dart';
 import 'notizen_uebersicht/notizen_uebersicht.dart';
 import 'notizen_uebersicht/notiz_model_builder.dart';
 //import 'einstellungen.dart';
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {                             //Definiert ei
         home: MyHomePage(),                                       // Startseite der App, leitet durch selectedIndex=0 zu Notizen() weiter
         routes: {
           '/bearbeiten': (context) => NotizBearbeiten(),          // leitet zu NotizBearbeiten() weiter, wichtig für neue_notiz (Navigator.pushNamed...)
-          '/einstellungen':(context) => Placeholder(),            // leitet zu Einstellungen() weiter, wichtig für notizen_uebersicht (Navigator.pushNamed...)
+          '/papierkorb':(context) => PapierkorbUebersicht(),            // leitet zu Einstellungen() weiter, wichtig für notizen_uebersicht (Navigator.pushNamed...)
         },
       ),
     );
@@ -165,7 +166,7 @@ class MyAppState extends ChangeNotifier {
   }                                                                 // erst bei nächstem Notizenübersicht() Aufruf wird die Notiz aus notiz[] gelöscht
 
 
-  void rueckgaengigPapierkorb() {
+  void rueckgaengigPapierkorb(String id) {
     final foundIndex = zuletztgeloescht.indexWhere((item) => item.id == id);
     if (foundIndex != -1) {
       notiz.add(zuletztgeloescht[foundIndex]);

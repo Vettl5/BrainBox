@@ -22,9 +22,9 @@ class _PapierkorbListeState extends State<PapierkorbListe> {
 
   Widget buildPapierkorbListe(MyAppState appState) {
     appState.ladenPapierkorb();
-    List<dynamic> notiz = appState.zuletztgeloescht;            //Liste mit Notizen
+    List<dynamic> papierkorb = appState.zuletztgeloescht;            //Liste mit Notizen
     
-    Widget papierkorbListe = notiz.isEmpty == true                 //Wenn überhaupt gar keine Notizen vorhanden sind
+    Widget papierkorbListe = papierkorb.isEmpty == true                 //Wenn überhaupt gar keine Notizen vorhanden sind
         ? SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
             child: Column(
@@ -45,16 +45,16 @@ class _PapierkorbListeState extends State<PapierkorbListe> {
         : ListView.builder(                                     //Notizen mit runder Checkbox davor anzeigen
             shrinkWrap: true,
             physics: BouncingScrollPhysics(),
-            itemCount: notiz.length,
+            itemCount: papierkorb.length,
             itemBuilder: (context, index) {
-              PapierkorbModel currentNotiz = notiz[index];
+              PapierkorbModel currentNotiz = papierkorb[index];
               return PapierkorbModelBuilder(
-                notiz: currentNotiz,                            // Übergabe vo Listenelement an NotizModelBuilder
+                muell: currentNotiz,                            // Übergabe vo Listenelement an NotizModelBuilder
               );
             },
           );
     
-    return notizenListe;
+    return papierkorbListe;
   }
 }
 
