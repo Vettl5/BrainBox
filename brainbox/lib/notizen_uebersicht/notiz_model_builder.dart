@@ -6,8 +6,8 @@ import '../main.dart';
 //------------------------notiz.dart soll Builder für eine Notiz darstellen------------------------//
 
 class NotizModelBuilder extends StatefulWidget {
-  final NotizModel notiz;
-  const NotizModelBuilder({
+  final NotizModel notiz;                           //Funktionsdefinition für json Dateieigenschaften (diese Attribute braucht jede Notiz)
+  const NotizModelBuilder({                         //Konstruktor, erwartet bei jedem Aufruf alle Parameter von notiz (also bei jedem Aufruf von NotizenUebersicht)
     Key? key,
     required this.notiz,
   }) : super(key: key);
@@ -21,7 +21,6 @@ class NotizModelBuilder extends StatefulWidget {
 class _NotizModBldState extends State<NotizModelBuilder> {
   //braucht man nur, wenn man Notizentext ändern will
   bool _isEditing = false;
-  bool _isChecked = false;
   TextEditingController _controller = TextEditingController();
 
   // Anzeigetext der Notiz eig. TextEditingController mit Notiztext als Default; Bearbeitungsmöglichkeit!
@@ -44,7 +43,7 @@ class _NotizModBldState extends State<NotizModelBuilder> {
       fontWeight: FontWeight.bold,
     );
 
-    if (_isChecked) {
+    if (widget.notiz.geloescht) {
       textStyle = textStyle.copyWith(
         decoration: TextDecoration.lineThrough,
         color: Colors.grey,
@@ -53,10 +52,10 @@ class _NotizModBldState extends State<NotizModelBuilder> {
 
     return ListTile(
       leading: Checkbox(
-        value: _isChecked,
+        value: widget.notiz.geloescht,
         onChanged: (value) {
           setState(() {
-            _isChecked = value ?? false;
+            widget.notiz.geloescht = value ?? false;
             appState.loeschenNotiz(widget.notiz.id);
           });
         },
@@ -91,7 +90,7 @@ class _NotizModBldState extends State<NotizModelBuilder> {
         setState(() {
           widget.notiz.text = _controller.text;
           _isEditing = false;
-          appState.aktualisierenNotiz(widget.notiz.id, widget.notiz.text);
+          appState.aendereNotiz(widget.notiz.id, widget.notiz.text);
         });
       },
     ),
@@ -102,16 +101,19 @@ class _NotizModBldState extends State<NotizModelBuilder> {
 class NotizModel {  // Struktur zum Abspeichern im Array Notiz (MyAppState) mit id, text und isChecked
   final String id;
   late String text;
+  bool geloescht;
 
   NotizModel({
     required this.id,
     required this.text,
+    this.geloescht = false,
   });
 
   factory NotizModel.fromJson(Map<String, dynamic> json) {
     return NotizModel(
       id: json['id'],
       text: json['text'],
+      geloescht: json['geloescht'],
     );
   }
 
@@ -119,9 +121,7 @@ class NotizModel {  // Struktur zum Abspeichern im Array Notiz (MyAppState) mit 
     return {
       'id': id,
       'text': text,
+      'geloescht': geloescht,
     };
   }
 }
-
-
-

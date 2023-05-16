@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 class MyAppState extends ChangeNotifier {
   List<dynamic> notiz = <NotizModel>[];                          // Liste der Notizen (inhalt)
-  List<dynamic> zuletztgeloescht = <NotizModel>[];
+  List<dynamic> zuletztgeloescht = [];
   final Uuid uuid = Uuid();
 
   /*--------------------------------------------Notizen--------------------------------------------------------------*/
@@ -170,16 +170,17 @@ class MyAppState extends ChangeNotifier {
 
   /*--------------------------------------------Dateiarbeit Funktionen------------------------------------------------------------*/
   void hinzufuegenNotiz(String text) {
+    bool geloescht = false;
     if(notiz.isEmpty) {                                             // falls Notiz hinzugefügt werden soll, aber Liste notiz[] noch leer ist
         initialisiereNotizen();
     }
-    final notizmodel = NotizModel(id: uuid.v4(), text: text);       // Erstellt eine Instanz von NotizModel; übergibt id und text, isChecked kommt von NotizModel selbst
+    final notizmodel = NotizModel(id: uuid.v4(), text: text, geloescht: geloescht);       // Erstellt eine Instanz von NotizModel; übergibt id und text, isChecked kommt von NotizModel selbst
     notiz.add(notizmodel);                                          // Notiz in Daten-Modell Form wird in Liste notiz[] gespeichert
     speichereNotizen();                                             // aktueller Listeninhalt von notiz[] wird in neuer JSON Datei gespeichert
     notifyListeners();                                              // informiert alle Widgets, dass sich die Daten geändert haben
   }
 
-  void aktualisierenNotiz(String id, String newText) {
+  void aendereNotiz(String id, String newText) {
     final foundIndex = notiz.indexWhere((item) => item.id == id);
     if (foundIndex != -1) {
       notiz[foundIndex].text = newText;
@@ -190,26 +191,20 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void loeschenNotiz(String id) {
+    hinzufuegenPapierkorb(id);                                  // zu löschende Notiz wird zuerst in Papierkorb übertragen
+    // Notizen aus Liste "notiz" entfernen, bei denen isChecked true ist
+    notiz.removeWhere((item) => item.id == id);
+    //speicherePapierkorb();                                    // zum Löschen ausgewählte Notiz wird zuerst in Papierkorb übertragen
+  }                                                             // erst bei nächstem Notizenübersicht() Aufruf wird die Notiz aus notiz[] gelöscht
+
   void hinzufuegenPapierkorb(String id) {
-    final foundIndex = notiz.indexWhere((item) => item.id == id);
-    if (foundIndex != -1) {
-      zuletztgeloescht.add(notiz[foundIndex]);
-      speicherePapierkorb();
-    } else {
-      print('Notiz konnte nicht Papierkorb hinzugefügt werden: ID $id nicht gefunden');
-    }
+      zuletztgeloescht.add(id);                                 //in zuletztgeloescht soll nur id gespeichert werden
+      speicherePapierkorb();                                    //
   }
 
 
-  void loeschenNotiz(String id) {
-    hinzufuegenPapierkorb(id);                                      // zu löschende Notiz wird zuerst in Papierkorb übertragen
-    // Notizen aus Liste "notiz" entfernen, bei denen isChecked true ist
-    notiz.removeWhere((item) => item.id == id);
-    //speicherePapierkorb();                                          // zum Löschen ausgewählte Notiz wird zuerst in Papierkorb übertragen
-  }                                                                 // erst bei nächstem Notizenübersicht() Aufruf wird die Notiz aus notiz[] gelöscht
-
-
-  void rueckgaengigPapierkorb(String id) {
+  void wiederherstellenAusPapierkorb(String id) {
     final foundIndex = zuletztgeloescht.indexWhere((item) => item.id == id);
     if (foundIndex != -1) {
       notiz.add(zuletztgeloescht[foundIndex]);

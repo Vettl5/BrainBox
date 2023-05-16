@@ -1,24 +1,26 @@
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
+import '../notizen_uebersicht/notiz_model_builder.dart';
 import '../main.dart';
 
 //------------------------notiz.dart soll Builder für eine Notiz darstellen------------------------//
 
-class PapierkorbModelBuilder extends StatefulWidget {
-  final PapierkorbModel muell;                              // Funktionsdeklarierung
-  const PapierkorbModelBuilder({                            // Konstruktor
+class PapierkorbElementBuilder extends StatefulWidget {
+  final id = 
+  final notiz = NotizModel();
+  const PapierkorbElementBuilder({
     Key? key,
-    required this.muell,
+    required this.notiz,
   }) : super(key: key);
 
   @override
-  State<PapierkorbModelBuilder> createState() => _PapierkorbModBldState();
+  State<PapierkorbElementBuilder> createState() => _PapierkorbElementBuilderState();
 }
 
 //-----------------------------------------------------------------------------------//
 
-class _PapierkorbModBldState extends State<PapierkorbModelBuilder> {
+class _PapierkorbElementBuilderState extends State<PapierkorbElementBuilder> {
   //braucht man nur, wenn man Notizentext ändern will
   bool _isChecked = true;                                             // in Papierkorbliste sind alle Notizen standardmäßig angekreuzt -> durchgestrichen, ausgegraut
 
@@ -35,7 +37,7 @@ class _PapierkorbModBldState extends State<PapierkorbModelBuilder> {
         onChanged: (value) {
           setState(() {
             _isChecked = value ?? true;
-            appState.rueckgaengigPapierkorb(widget.muell.id);
+            appState.wiederherstellenAusPapierkorb(widget.muell.id);
           });
         },
       ),
@@ -47,30 +49,6 @@ class _PapierkorbModBldState extends State<PapierkorbModelBuilder> {
         ),
       ),
     );
-  }
-}
-
-class PapierkorbModel {  // Struktur zum Abspeichern im Array Notiz (MyAppState) mit id, text und isChecked
-  final String id;
-  late String text;
-
-  PapierkorbModel({
-    required this.id,
-    required this.text,
-  });
-
-  factory PapierkorbModel.fromJson(Map<String, dynamic> json) {
-    return PapierkorbModel(
-      id: json['id'],
-      text: json['text'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'text': text,
-    };
   }
 }
 
