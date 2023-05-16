@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
-import 'notiz_model_builder.dart';
+import 'notiz_listtile_builder.dart';
 
 /*----------------------------------NOTIZEN WIDGET GENERATOR-------------------------------------*/
  
@@ -21,10 +21,10 @@ class _PapierkorbListeState extends State<PapierkorbListe> {
   }
 
   Widget buildPapierkorbListe(MyAppState appState) {
-    appState.ladenPapierkorb();
     List<dynamic> papierkorb = appState.zuletztgeloescht;            //Liste mit Notizen
     
-    Widget papierkorbListe = papierkorb.isEmpty == true                 //Wenn überhaupt gar keine Notizen vorhanden sind
+    Widget papierkorbListe = papierkorb.isEmpty == true              //Wenn überhaupt gar keine Notizen vorhanden sind
+        
         ? SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
             child: Column(
@@ -42,14 +42,16 @@ class _PapierkorbListeState extends State<PapierkorbListe> {
               ],
             ),
           )
-        : ListView.builder(                                     //Notizen mit runder Checkbox davor anzeigen
+        
+        : ListView.builder(                               //Notizen mit runder Checkbox davor anzeigen
             shrinkWrap: true,
             physics: BouncingScrollPhysics(),
             itemCount: papierkorb.length,
             itemBuilder: (context, index) {
-              NotizModel currentNotiz = papierkorb[index];
-              return NotizModelBuilder(
-                notiz: currentNotiz,                            // Übergabe vo Listenelement an NotizModelBuilder
+              return NotizListTileBuilder(                // Übergabe von Listenelement Parametern an NotizListTileBuilder
+                id: papierkorb[index].id,
+                text: papierkorb[index].text,
+                geloescht: papierkorb[index].geloescht,
               );
             },
           );
@@ -58,3 +60,15 @@ class _PapierkorbListeState extends State<PapierkorbListe> {
   }
 }
 
+
+/*ListView.builder(                                     //Notizen mit runder Checkbox davor anzeigen
+            shrinkWrap: true,
+            physics: BouncingScrollPhysics(),
+            itemCount: papierkorb.length,
+            itemBuilder: (context, index) {
+              NotizModel geloeschteNotiz = papierkorb[index];
+              return NotizModelBuilder(
+                notiz: geloeschteNotiz,                            // Übergabe vo Listenelement an NotizModelBuilder
+              );
+            },
+          );*/

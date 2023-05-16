@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';                      // für klassenüb
 import 'neue_notiz.dart';
 import 'notizen_oder_papierkorb_laden.dart';
 import 'notizen_uebersicht/notiz_model_builder.dart';
-import 'notizen_uebersicht/papierkorb_model_builder.dart';
+//import 'notizen_uebersicht/papierkorb_model_builder.dart';
 
 /*----------------------------------------------------------------------------------------------------------*/
 
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 class MyAppState extends ChangeNotifier {
   List<dynamic> notiz = <NotizModel>[];                          // Liste der Notizen (inhalt)
-  List<dynamic> zuletztgeloescht = [];
+  List<dynamic> zuletztgeloescht = <NotizModel>[];
   final Uuid uuid = Uuid();
 
   /*--------------------------------------------Notizen--------------------------------------------------------------*/
@@ -53,8 +53,9 @@ class MyAppState extends ChangeNotifier {
 
       if (await file.exists()) {
         ladenNotizen();
+        ladenPapierkorb();
       } else {
-        initialisiereNotizen();
+        initialisiereDateien();
       }
   }
 
@@ -76,14 +77,20 @@ class MyAppState extends ChangeNotifier {
   }
 
   //wenn Notizdatei noch nicht existiert, erstelle Notizdatei
-  Future<void> initialisiereNotizen() async {
+  Future<void> initialisiereDateien() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/notizen.json');
+      final fileNotizen = File('${directory.path}/notizen.json');
+      final filePapierkorb = File('${directory.path}/papierkorb.json');
 
-      if (!await file.exists()) {
+      if (!await fileNotizen.exists()) {
         final jsonString = json.encode(notiz);
-        await file.writeAsString(jsonString);
+        await fileNotizen.writeAsString(jsonString);
+      }
+
+      if (!await filePapierkorb.exists()) {
+        final jsonString = json.encode(zuletztgeloescht);
+        await filePapierkorb.writeAsString(jsonString);
       }
     } catch (e) {
       print('Fehler beim Initialisieren der Notizen: $e');
@@ -96,9 +103,6 @@ class MyAppState extends ChangeNotifier {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/notizen.json');
 
-      /*alt:
-      //final jsonList = notiz.map((item) => item.toJson()).toList();*/
-
       //lese Array (in NotizModel Format, s.o.) aus & konvertiere es in eine Liste, verschlüssel die Liste im json Format
       final jsonString = json.encode(notiz.toList());
 
@@ -107,19 +111,11 @@ class MyAppState extends ChangeNotifier {
     } catch (e) {
       print('Fehler beim Speichern der Notizen: $e');
     }
+    notifyListeners();
   }
 
   /*--------------------------------------------Papierkorb------------------------------------------------------------*/
-  Future<void> checkIfPapierkorbExists() async {
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/papierkorb.json');
-
-      if (await file.exists()) {
-        ladenPapierkorb();
-      } else {
-        initialisierePapierkorb();
-      }
-  }
+  
 
   //wenn Notizdatei bereits existiert, lade Notizen
   Future<void> ladenPapierkorb() async {
@@ -138,20 +134,6 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  //wenn Notizdatei noch nicht existiert, erstelle Notizdatei
-  Future<void> initialisierePapierkorb() async {
-    try {
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/papierkorb.json');
-
-      if (!await file.exists()) {
-        final jsonString = json.encode(zuletztgeloescht);
-        await file.writeAsString(jsonString);
-      }
-    } catch (e) {
-      print('Fehler beim Initialisieren des Papierkorbs: $e');
-    }
-  }
 
   Future<void> speicherePapierkorb() async {
     try {
@@ -171,16 +153,13 @@ class MyAppState extends ChangeNotifier {
   /*--------------------------------------------Dateiarbeit Funktionen------------------------------------------------------------*/
   void hinzufuegenNotiz(String text) {
     bool geloescht = false;
-    if(notiz.isEmpty) {                                             // falls Notiz hinzugefügt werden soll, aber Liste notiz[] noch leer ist
-        initialisiereNotizen();
-    }
     final notizmodel = NotizModel(id: uuid.v4(), text: text, geloescht: geloescht);       // Erstellt eine Instanz von NotizModel; übergibt id und text, isChecked kommt von NotizModel selbst
     notiz.add(notizmodel);                                          // Notiz in Daten-Modell Form wird in Liste notiz[] gespeichert
     speichereNotizen();                                             // aktueller Listeninhalt von notiz[] wird in neuer JSON Datei gespeichert
     notifyListeners();                                              // informiert alle Widgets, dass sich die Daten geändert haben
   }
 
-  void aendereNotiz(String id, String newText) {
+  /*void aendereNotiz(String id, String newText) {
     final foundIndex = notiz.indexWhere((item) => item.id == id);
     if (foundIndex != -1) {
       notiz[foundIndex].text = newText;
@@ -189,26 +168,30 @@ class MyAppState extends ChangeNotifier {
       print('Notiz konnte nicht aktualisiert werden: ID $id nicht gefunden');
     }
     notifyListeners();
+  }*/
+
+
+  // sucht Listenelement mit entsprechender ID aus notiz[] und fügt es in zuletztgeloescht[] ein
+  void verschiebenInPapierkorb(String id) {
+    final foundIndex = notiz.indexWhere((item) => item.id == id); // Suche nach der Notiz mit der angegebenen ID
+    if (foundIndex != -1) {
+      final notizElement = notiz[foundIndex];                     // Das gefundene Notiz-Element
+      zuletztgeloescht.add(notizElement);                         // Hinzufügen des Notiz-Elements zur Liste zuletztgeloescht
+      notiz.removeAt(foundIndex);                                 // Entfernen des Notiz-Elements aus der Liste notiz
+      speicherePapierkorb();                                      // notizen.json wird aktualisiert/gespeichert
+      speichereNotizen();                                         // papierkorb.json wird aktualisiert/gespeichert
+    } else {
+      print('Notiz konnte nicht zum Papierkorb hinzugefügt werden: ID $id nicht gefunden');
+    }
   }
-
-  void loeschenNotiz(String id) {
-    hinzufuegenPapierkorb(id);                                  // zu löschende Notiz wird zuerst in Papierkorb übertragen
-    // Notizen aus Liste "notiz" entfernen, bei denen isChecked true ist
-    notiz.removeWhere((item) => item.id == id);
-    //speicherePapierkorb();                                    // zum Löschen ausgewählte Notiz wird zuerst in Papierkorb übertragen
-  }                                                             // erst bei nächstem Notizenübersicht() Aufruf wird die Notiz aus notiz[] gelöscht
-
-  void hinzufuegenPapierkorb(String id) {
-      zuletztgeloescht.add(id);                                 //in zuletztgeloescht soll nur id gespeichert werden
-      speicherePapierkorb();                                    //
-  }
-
 
   void wiederherstellenAusPapierkorb(String id) {
     final foundIndex = zuletztgeloescht.indexWhere((item) => item.id == id);
     if (foundIndex != -1) {
-      notiz.add(zuletztgeloescht[foundIndex]);
-      speichereNotizen();
+      notiz.add(zuletztgeloescht[foundIndex]);                    // aktualisierte Notiz aus zuletztgeloescht[] wird in notiz[] eingefügt
+      zuletztgeloescht.removeAt(foundIndex);                      // aktualisierte Notiz wird nach speichern in notiz[] aus zuletztgeloescht[] entfernt
+      speichereNotizen();                                         // notizen.json wird aktualisiert/gespeichert
+      speicherePapierkorb();                                      // papierkorb.json wird aktualisiert/gespeichert
     } else {
       print('Notiz mit ID $id nicht gefunden');
     }
@@ -218,15 +201,15 @@ class MyAppState extends ChangeNotifier {
 /*----------------------------------------------------------------------------------------------------------*/
 //StatefulWidget nötig, da sich die Startseite entsprechend des selectedIndex ändert (Notizenübersicht, Neue Notiz, Einstellungen)
 
-class MyHomePage extends StatefulWidget {                           //Widget von MyHomePage (quasi gesamter Bildschirm)
-  const MyHomePage({super.key});                                    //Konstruktor für MyHomePage
+class MyHomePage extends StatefulWidget {                         //Widget von MyHomePage (quasi gesamter Bildschirm)
+  const MyHomePage({super.key});                                  //Konstruktor für MyHomePage
   @override
-  State<MyHomePage> createState() => _MyHomePageState();            //State für MyHomePage wird erstellt
+  State<MyHomePage> createState() => _MyHomePageState();          //State für MyHomePage wird erstellt
 }
 
 
-class _MyHomePageState extends State<MyHomePage> {                  //State Klasse für MyHomePage; Private Klasse, da nur in MyHomePage verwendet
-  var selectedIndex = 0;                                           //Variable selectedIndex mit Wert 0 (Startseite) wird erstellt
+class _MyHomePageState extends State<MyHomePage> {                //State Klasse für MyHomePage; Private Klasse, da nur in MyHomePage verwendet
+  var selectedIndex = 0;                                          //Variable selectedIndex mit Wert 0 (Startseite) wird erstellt
   
 
   @override
@@ -235,13 +218,13 @@ class _MyHomePageState extends State<MyHomePage> {                  //State Klas
     Widget page;
     switch (selectedIndex) {
     case 0:
-      page = NotizenOderPapierkorb();                           //Notizenübersicht, Startseite
+      page = NotizenOderPapierkorb();                             //Notizenübersicht, Startseite
       break;
     case 1:
-      page = NeueNotiz();                         //Neue Notiz anlegen und anschließend öffnen
+      page = NeueNotiz();                                         //Neue Notiz anlegen und anschließend öffnen
       break;
     default:
-      throw UnimplementedError('No widget for $selectedIndex');       //Just in case
+      throw UnimplementedError('No widget for $selectedIndex');   //Just in case
     }
 
     var mainArea = ColoredBox(

@@ -1,4 +1,4 @@
-import 'package:provider/provider.dart';
+/*import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
 import '../notizen_uebersicht/notiz_model_builder.dart';
@@ -7,8 +7,6 @@ import '../main.dart';
 //------------------------notiz.dart soll Builder für eine Notiz darstellen------------------------//
 
 class PapierkorbElementBuilder extends StatefulWidget {
-  final id = 
-  final notiz = NotizModel();
   const PapierkorbElementBuilder({
     Key? key,
     required this.notiz,
@@ -50,7 +48,7 @@ class _PapierkorbElementBuilderState extends State<PapierkorbElementBuilder> {
       ),
     );
   }
-}
+}*/
 
 
 

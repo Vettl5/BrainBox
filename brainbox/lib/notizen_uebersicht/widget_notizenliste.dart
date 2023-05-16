@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
-import 'notiz_model_builder.dart';
+import 'notiz_listtile_builder.dart';
 
 /*----------------------------------NOTIZEN WIDGET GENERATOR-------------------------------------*/
  
@@ -25,6 +25,7 @@ class _NotizenListeState extends State<NotizenListe> {
     List<dynamic> notiz = appState.notiz;                     //Liste mit Notizen
     
     Widget notizenListe = notiz.isEmpty == true               //Wenn überhaupt gar keine Notizen vorhanden sind
+        
         ? SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
             child: Column(
@@ -42,14 +43,16 @@ class _NotizenListeState extends State<NotizenListe> {
               ],
             ),
           )
-        : ListView.builder(                                     //Notizen mit runder Checkbox davor anzeigen
+
+        : ListView.builder(                               //Notizen mit runder Checkbox davor anzeigen
             shrinkWrap: true,
             physics: BouncingScrollPhysics(),
             itemCount: notiz.length,
             itemBuilder: (context, index) {
-              NotizModel currentNotiz = notiz[index];
-              return NotizModelBuilder(
-                notiz: currentNotiz,                            // Übergabe vo Listenelement an NotizModelBuilder
+              return NotizListTileBuilder(                // Übergabe von Listenelement Parametern an NotizListTileBuilder
+                id: notiz[index].id,
+                text: notiz[index].text,
+                geloescht: notiz[index].geloescht,
               );
             },
           );
