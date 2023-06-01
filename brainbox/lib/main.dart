@@ -6,10 +6,9 @@ import 'package:flutter/material.dart';                       // für UI
 import 'package:provider/provider.dart';                      // für klassenübergreifenenden Zugriff auf Daten 
 //import 'package:shared_preferences/shared_preferences.dart'; // für dauerhafte Speicherung von Daten     
 
-import 'neue_notiz.dart';
-import 'notizen_oder_papierkorb_laden.dart';
-import 'notizen_builder/notiz_model_builder.dart';
-//import 'notizen_uebersicht/papierkorb_model_builder.dart';
+import '../notizen_uebersicht/notizen_uebersicht.dart';       // für Notizenübersicht
+import '../notizen_uebersicht/papierkorb_uebersicht.dart';    // für Papierkorbübersicht
+import '../notizen_builder/notiz_model_builder.dart';
 
 /*----------------------------------------------------------------------------------------------------------*/
 
@@ -31,10 +30,6 @@ class MyApp extends StatelessWidget {                             //Definiert ei
           colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 92, 124, 182)),
         ),
         home: MyHomePage(),                                       // Startseite der App, leitet durch selectedIndex=0 zu Notizen() weiter
-        routes: {
-          //'/notizen': (context) => NotizenUebersicht(),          // leitet zu NotizBearbeiten() weiter, wichtig für neue_notiz (Navigator.pushNamed...)
-          //'/papierkorb':(context) => PapierkorbUebersicht(),            // leitet zu Einstellungen() weiter, wichtig für notizen_uebersicht (Navigator.pushNamed...)
-        },
       ),
     );
   }
@@ -150,6 +145,24 @@ class MyAppState extends ChangeNotifier {
     }
   }
 
+  Future<void> bereinigePapierkorb() async {
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/papierkorb.json');
+
+    if (await file.exists()) {
+      await file.delete();                                          // Lösche die Datei, falls sie existiert
+    }
+
+    zuletztgeloescht.clear();                                       // Leere das Array
+
+    notifyListeners();
+  } catch (e) {
+    print('Fehler beim Bereinigen des Papierkorbs: $e');
+  }
+}
+
+
   /*--------------------------------------------Dateiarbeit Funktionen------------------------------------------------------------*/
   void hinzufuegenNotiz(String text) {
     bool geloescht = false;
@@ -158,17 +171,6 @@ class MyAppState extends ChangeNotifier {
     speichereNotizen();                                             // aktueller Listeninhalt von notiz[] wird in neuer JSON Datei gespeichert
     notifyListeners();                                              // informiert alle Widgets, dass sich die Daten geändert haben
   }
-
-  /*void aendereNotiz(String id, String newText) {
-    final foundIndex = notiz.indexWhere((item) => item.id == id);
-    if (foundIndex != -1) {
-      notiz[foundIndex].text = newText;
-      speichereNotizen();
-    } else {
-      print('Notiz konnte nicht aktualisiert werden: ID $id nicht gefunden');
-    }
-    notifyListeners();
-  }*/
 
 
   // sucht Listenelement mit entsprechender ID aus notiz[] und fügt es in zuletztgeloescht[] ein
@@ -218,10 +220,10 @@ class _MyHomePageState extends State<MyHomePage> {                //State Klasse
     Widget page;
     switch (selectedIndex) {
     case 0:
-      page = NotizenOderPapierkorb();                             //Notizenübersicht, Startseite
+      page = NotizenUebersicht();                                 //Notizenübersicht, Startseite
       break;
     case 1:
-      page = NeueNotiz();                                         //Neue Notiz anlegen und anschließend öffnen
+      page = PapierkorbUebersicht();                              //Einstellungen öffnen
       break;
     default:
       throw UnimplementedError('No widget for $selectedIndex');   //Just in case
@@ -235,49 +237,40 @@ class _MyHomePageState extends State<MyHomePage> {                //State Klasse
       ),
     );
 
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return Column(
-            children: [
-              Expanded(child: mainArea),
-              SafeArea(
-                child: BottomNavigationBar(
-                  backgroundColor: Color.fromARGB(255, 167, 213, 255),
-                  items: const <BottomNavigationBarItem>[
-                    BottomNavigationBarItem(                          //Notizenübesicht, Startseite
-                      icon: Icon(Icons.menu),         
-                      label: 'Notizen',
-                    ),
-                    BottomNavigationBarItem(                          //Neue Notiz anlegen
-                      icon: Icon(Icons.add_circle_outline),     
-                      label: 'Neue Notiz',
-                    ),
-                  ],
-                  currentIndex: selectedIndex,       
-                  onTap: (value) {                     
-                    setState(() {                     
-                      selectedIndex = value;                          //selectedIndex wird auf den Wert von value gesetzt, entsprechende page im nächsten reload     
-                      print(value);                                   //Ausgabe des Wertes von value in der Konsole, nur zur Kontrolle                   
-                    });
-                  },
-                ),
-              ),
-            ],
-          );
-        },
+    return SafeArea(
+      child: Scaffold(
+
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            return Column(
+              children: [
+                Expanded(child: mainArea),
+              ],
+            );
+          },
+        ),
+
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: Color.fromARGB(255, 167, 213, 255),
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(                          //Notizenübesicht, Startseite
+              icon: Icon(Icons.menu),         
+              label: 'Notizen',
+            ),
+            BottomNavigationBarItem(                          //Neue Notiz anlegen
+              icon: Icon(Icons.delete),     
+              label: 'Papierkorb',
+            ),
+          ],
+          currentIndex: selectedIndex,       
+          onTap: (value) {                     
+            setState(() {                     
+              selectedIndex = value;                          //selectedIndex wird auf den Wert von value gesetzt, entsprechende page im nächsten reload     
+              print(value);                                   //Ausgabe des Wertes von value in der Konsole, nur zur Kontrolle                   
+            });
+          },
+        ),
       ),
     );
   }
 }
-
-
-  //wird nötig, wenn Notizen aus Speicher geladen werden sollen
-  /*void loadNotizen() async {                                        // Funktion, die die Liste der Notizen neu lädt (wird bei Änderungen aufgerufen, um z.B. notizen_uebersicht.dart zu aktualisieren)
-    final appDocumentsDirectory = await _appDocumentsDirectory;     // _appDocumentsDirectory muss in appDocumentsDirectory gespeichert werden, da _appDocumentsDirectory sonst nicht in der Funktion verwendet werden kann
-    final files = appDocumentsDirectory!.listSync();                // Liste der Dateien im Ordner der App wird gespeichert
-    notizenname = files
-        .where((file) => file.path.endsWith('.txt'))                // Nur Dateien, die auf .txt enden, werden ausgewählt
-        .map((file) => file.path).toList();                         // Namen der Dateien werden zur Liste der Notizen hinzugefügt
-    notifyListeners();                                              // Listener wird benachrichtigt, dass die Notizen geladen wurden
-  }*/

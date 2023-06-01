@@ -47,21 +47,36 @@ class _NotizenListTileState extends State<NotizenListTile> {
             ),
           )
 
-        : ListView.separated(
-            shrinkWrap: true,
-            physics: BouncingScrollPhysics(),
-            scrollDirection: Axis.vertical,
-            itemCount: notiz.length,
-            itemBuilder: (context, index) {
-              return NotizListTileBuilder(
-                id: notiz[index].id,
-                text: notiz[index].text,
-                geloescht: notiz[index].geloescht,
-              );
-            },
-            separatorBuilder: (BuildContext context, int index) => const Divider(),
+        : Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        itemCount: notiz.length,
+                        itemBuilder: (context, index) {
+                          return NotizListTileBuilder(
+                            id: notiz[index].id,
+                            text: notiz[index].text,
+                            geloescht: notiz[index].geloescht,
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) => const Divider(),
+                      ),
+                      SizedBox(height: 200),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           );
 
+    
     return notizenListe;
   }
 }

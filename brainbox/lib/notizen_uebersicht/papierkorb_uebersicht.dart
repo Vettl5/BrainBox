@@ -9,8 +9,7 @@ import '../notizen_widgets/widget_papierkorbliste.dart';
 /*-----------------------------------------------------NOTIZEN ÜBERSICHT----------------------------------------------------------*/
 
 class PapierkorbUebersicht extends StatefulWidget {
-  final Function(int) onToggleIndex;
-  PapierkorbUebersicht({required this.onToggleIndex, Key? key}) : super(key: key);
+  PapierkorbUebersicht({Key? key,}) : super(key: key);
   @override
   State<PapierkorbUebersicht> createState() => _PapierkorbUebState();
 }
@@ -29,19 +28,49 @@ class _PapierkorbUebState extends State<PapierkorbUebersicht> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, size: 30, color: Colors.white),
-                  onPressed: () {
-                    widget.onToggleIndex(0); // Aufruf der Callback-Funktion
-                  },
-                ),
                 title: const Text('Gelöschte Notizen', 
                   style: TextStyle(
-                    fontSize: 30, 
+                    fontSize: 27, 
                     fontWeight: FontWeight.bold, 
                     color: Colors.white,
                   ),
                 ),
+                centerTitle: true, // Text wird in der Mitte zentriert
+                actions: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.delete_forever_outlined,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Löschen bestätigen'),
+                            content: Text('Möchten Sie wirklich alle Elemente löschen?'),
+                            actions: [
+                              TextButton(
+                                child: Text('Abbrechen'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              TextButton(
+                                child: Text('Löschen'),
+                                onPressed: () {
+                                  appState.bereinigePapierkorb();
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ],
                 backgroundColor: Theme.of(context).colorScheme.primary,
               ),
       body: PapierkorbListe(),                     //Generierung der Notizenliste
