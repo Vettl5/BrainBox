@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
-import 'widget_notizenliste.dart';
+import '../notizen_widgets/widget_notizenliste.dart';
 
 /*-----------------------------------------------------NOTIZEN ÜBERSICHT----------------------------------------------------------*/
 

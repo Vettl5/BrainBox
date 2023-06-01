@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';                      // für klassenüb
 
 import 'neue_notiz.dart';
 import 'notizen_oder_papierkorb_laden.dart';
-import 'notizen_uebersicht/notiz_model_builder.dart';
+import 'notizen_builder/notiz_model_builder.dart';
 //import 'notizen_uebersicht/papierkorb_model_builder.dart';
 
 /*----------------------------------------------------------------------------------------------------------*/
