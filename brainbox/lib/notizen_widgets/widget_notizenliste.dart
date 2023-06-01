@@ -7,20 +7,20 @@ import '../notizen_builder/notiz_listtile_builder.dart';
 /*----------------------------------NOTIZEN WIDGET GENERATOR-------------------------------------*/
  
 
-class NotizenListe extends StatefulWidget {
-  const NotizenListe({super.key});
+class NotizenListTile extends StatefulWidget {
+  const NotizenListTile({super.key});
   @override
-  State<NotizenListe> createState() => _NotizenListeState();
+  State<NotizenListTile> createState() => _NotizenListTileState();
 }
 
-class _NotizenListeState extends State<NotizenListe> {
+class _NotizenListTileState extends State<NotizenListTile> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    return buildNotizenListe(appState);                                     
+    return _buildNotizenListTile(appState);                                     
   }
 
-  Widget buildNotizenListe(MyAppState appState) {
+  Widget _buildNotizenListTile(MyAppState appState) {
     appState.checkIfNotizExists();
     List<dynamic> notiz = appState.notiz;                     //Liste mit Notizen
     
@@ -32,32 +32,36 @@ class _NotizenListeState extends State<NotizenListe> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  "Keine Notizen vorhanden!",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Theme.of(context).colorScheme.onBackground,
+                Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Keine Notizen vorhanden! \n\n Erstelle eine neue Notiz, indem du auf das Plus klickst.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Theme.of(context).colorScheme.onBackground,
+                    ),
                   ),
                 ),
               ],
             ),
           )
 
-        : ListView.builder(                               //Notizen mit runder Checkbox davor anzeigen
+        : ListView.separated(
             shrinkWrap: true,
             physics: BouncingScrollPhysics(),
+            scrollDirection: Axis.vertical,
             itemCount: notiz.length,
             itemBuilder: (context, index) {
-              return NotizListTileBuilder(                // Übergabe von Listenelement Parametern an NotizListTileBuilder
+              return NotizListTileBuilder(
                 id: notiz[index].id,
                 text: notiz[index].text,
                 geloescht: notiz[index].geloescht,
               );
             },
+            separatorBuilder: (BuildContext context, int index) => const Divider(),
           );
-    
+
     return notizenListe;
   }
 }
-

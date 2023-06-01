@@ -17,10 +17,10 @@ class _PapierkorbListeState extends State<PapierkorbListe> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    return buildPapierkorbListe(appState);                                     
+    return _buildPapierkorbListe(appState);                                     
   }
 
-  Widget buildPapierkorbListe(MyAppState appState) {
+  Widget _buildPapierkorbListe(MyAppState appState) {
     List<dynamic> papierkorb = appState.zuletztgeloescht;            //Liste mit Notizen
     
     Widget papierkorbListe = papierkorb.isEmpty == true              //Wenn überhaupt gar keine Notizen vorhanden sind
@@ -31,19 +31,22 @@ class _PapierkorbListeState extends State<PapierkorbListe> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  "Keine gelöschten Notizen vorhanden!",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Theme.of(context).colorScheme.onBackground,
+                Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Keine gelöschten Notizen vorhanden!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Theme.of(context).colorScheme.onBackground,
+                    ),
                   ),
                 ),
               ],
             ),
           )
         
-        : ListView.builder(                               //Notizen mit runder Checkbox davor anzeigen
+        : ListView.separated(                               //Notizen mit runder Checkbox davor anzeigen
             shrinkWrap: true,
             physics: BouncingScrollPhysics(),
             itemCount: papierkorb.length,
@@ -54,6 +57,7 @@ class _PapierkorbListeState extends State<PapierkorbListe> {
                 geloescht: papierkorb[index].geloescht,
               );
             },
+            separatorBuilder: (BuildContext context, int index) => const Divider(),
           );
     
     return papierkorbListe;

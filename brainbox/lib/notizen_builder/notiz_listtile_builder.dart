@@ -28,12 +28,20 @@ class _NotizListTileBuilderState extends State<NotizListTileBuilder> {
   //braucht man nur, wenn man Notizentext ändern will
   bool _isEditing = false;
   TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   // Anzeigetext der Notiz eig. TextEditingController mit Notiztext als Default; Bearbeitungsmöglichkeit!
   @override                                                           
   void initState() {
     super.initState();
     _controller.text = widget.text;
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
   }
 
   @override                                                           
@@ -143,6 +151,7 @@ class _NotizListTileBuilderState extends State<NotizListTileBuilder> {
       onPressed: () {
         setState(() {
           _isEditing = true;
+          _focusNode.requestFocus(); // Fokus auf das Textfeld setzen
         });
       },
     ),
@@ -168,8 +177,12 @@ class _NotizListTileBuilderState extends State<NotizListTileBuilder> {
 
 
     return ListTile(
+      onTap: () {
+        _focusNode.requestFocus(); // Fokus auf das Textfeld setzen
+      },
       title: TextFormField(
         controller: _controller,
+        focusNode: _focusNode,
         style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,

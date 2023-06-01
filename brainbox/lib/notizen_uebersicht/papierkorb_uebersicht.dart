@@ -28,11 +28,7 @@ class _PapierkorbUebState extends State<PapierkorbUebersicht> {
     /*--------------------------------------------------------LISTVIEW-----------------------------------------------------------*/
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return Column(
-            children: [
-              AppBar(
+      appBar: AppBar(
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back, size: 30, color: Colors.white),
                   onPressed: () {
@@ -48,12 +44,7 @@ class _PapierkorbUebState extends State<PapierkorbUebersicht> {
                 ),
                 backgroundColor: Theme.of(context).colorScheme.primary,
               ),
-              PapierkorbListe(),                     //Generierung der Notizenliste
-            ],
-          );
-        },
-      ),
+      body: PapierkorbListe(),                     //Generierung der Notizenliste
     );
-
   }
 }

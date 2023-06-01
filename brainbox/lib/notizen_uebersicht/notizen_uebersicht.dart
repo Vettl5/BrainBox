@@ -31,6 +31,51 @@ class _NotizenUebState extends State<NotizenUebersicht> {
     /*--------------------------------------------------------LISTVIEW-----------------------------------------------------------*/
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
+      appBar: AppBar(
+                title: const Text('BrainBox', 
+                  style: TextStyle(
+                    fontSize: 30, 
+                    fontWeight: FontWeight.bold, 
+                    color: Colors.white,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                actions: [
+                  IconButton(                                                                     //Optionmenü Button
+                    icon: const Icon(Icons.more_vert, size: 30, color: Colors.white),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return SizedBox(
+                            height: 200,
+                            child: Column(
+                              children: [
+                                //Papierkorb öffnen:
+                                ListTile(
+                                  leading: Icon(Icons.delete),
+                                  title: Text('Gelöschte Notizen wiederherstellen'),
+                                  onTap: () {
+                                    widget.onToggleIndex(1);    // Aufruf der Callback-Funktion
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  )
+                ],
+              ),
+      body: NotizenListTile(),                     //Generierung der Notizenliste
+    );
+  }
+}
+
+/*return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: LayoutBuilder(
         builder: (context, constraints) {
           return Column(
@@ -78,6 +123,4 @@ class _NotizenUebState extends State<NotizenUebersicht> {
           );
         },
       ),
-    );
-  }
-}
+    );*/
