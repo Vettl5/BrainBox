@@ -1,4 +1,4 @@
-// Als Erweiterungsmöglichkeit beibehalten
+// Als Erweiterungsmöglichkeit beibehalten, aber während der Appprogrammierung vorerst verworfen
 // Wird nur benötigt, falls jedes ListTile in widget_notizenliste.dart eine eigene Seite zum Bearbeiten der Notiz bekommt
 // Momentan repräsentiert aber jedes ListTile die Notiz selbst und keinen Dateititel einer extra Datei!
 

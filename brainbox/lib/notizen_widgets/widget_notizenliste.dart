@@ -1,3 +1,5 @@
+//Erstellt eine ListView mit allen Notizen, die in der Liste notiz in main.dart gespeichert sind
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,11 +22,12 @@ class _NotizenListTilesState extends State<NotizenListTiles> {
   }
 
   Widget _buildNotizenListTile(MyAppState appState) {
-    appState.checkIfNotizExists();
-    List<dynamic> notiz = appState.notiz;                     //Liste mit Notizen
+    appState.checkIfNotizExists();                            //initiiert Überprüfung in MyAppState (main.dart), ob Notizdateien existieren (wichtig beim ersten Start der App)
+    List<dynamic> notiz = appState.notiz;                     //Lokale Kopie der Liste mit Notizen aus MyAppState() (main.dart)
     
     Widget notizenListe = notiz.isEmpty == true               //Wenn überhaupt gar keine Notizen vorhanden sind
         
+        //------------------------------------------------LEERES FELD MIT TEXT-----------------------------------------------//
         ? SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
             child: Column(
@@ -46,6 +49,7 @@ class _NotizenListTilesState extends State<NotizenListTiles> {
             ),
           )
 
+        //------------------------------------------------LISTVIEW ALLER NOTIZEN-----------------------------------------------//
         : Column(
             children: [
               Expanded(
@@ -53,21 +57,21 @@ class _NotizenListTilesState extends State<NotizenListTiles> {
                   physics: BouncingScrollPhysics(),
                   child: Column(
                     children: [
-                      ListView.separated(
+                      ListView.separated(                                 //Listview mit Trennstrichen zwischen den einzelnen Notizen
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
                         scrollDirection: Axis.vertical,
-                        itemCount: notiz.length,
+                        itemCount: notiz.length,                          //Anzahl der Listtiles = Anzahl der Notizen in appState.notizen[]
                         itemBuilder: (context, index) {
-                          return NotizListTileBuilder(
+                          return NotizListTileBuilder(                    //Aufruf von NotizListTileBuilder in notiz_listtile_builder.dart und Übergabe der Notizdaten der Notiz am entsprechenden Index
                             id: notiz[index].id,
                             text: notiz[index].text,
                             geloescht: notiz[index].geloescht,
                           );
                         },
-                        separatorBuilder: (BuildContext context, int index) => const Divider(),
+                        separatorBuilder: (BuildContext context, int index) => const Divider(),     //für die Trennstriche
                       ),
-                      SizedBox(height: 200),
+                      SizedBox(height: 200),          //weißes Feld unterhalb des letzten Listtiles, um Editing-Button niemals zu überdecken durch Floating Action Button
                     ],
                   ),
                 ),

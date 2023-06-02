@@ -1,6 +1,10 @@
+//Funktion baut für jede in der json Datei gespeicherte Notiz ein ListTile, 
+//welches dann in der NotizenUebersicht oder PapierkorbUebersicht angezeigt wird.
+//Wird iterativ von widget_notizenliste.dart aufgerufen (so oft, wie Notizen in der json Datei gespeichert sind) und
+//bekommt die entsprechenden Eigenschaften der Notiz übergeben.
+
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 
 import '../main.dart';
 import 'notiz_model_builder.dart';
@@ -11,8 +15,8 @@ class NotizListTileBuilder extends StatefulWidget {
   final String text;
   final bool geloescht;
   
-  NotizListTileBuilder({                         /* Konstruktor, erwartet bei jedem Aufruf alle Parameter der zu ladenden Notiz (also bei 
-                                                 jedem Aufruf von NotizenUebersicht oder PapierkorbUebersicht)*/
+  NotizListTileBuilder({                              /* Konstruktor, erwartet bei jedem Aufruf alle Parameter der zu ladenden Notiz (also bei 
+                                                      jedem Aufruf von NotizenUebersicht oder PapierkorbUebersicht)*/
     Key? key,
     required this.id,
     required this.text,
@@ -28,17 +32,18 @@ class NotizListTileBuilder extends StatefulWidget {
 class _NotizListTileBuilderState extends State<NotizListTileBuilder> {
   //braucht man nur, wenn man Notizentext ändern will
   bool _isEditing = false;
-  TextEditingController _controller = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
+  TextEditingController _controller = TextEditingController();      //für Eingabefeld
+  final FocusNode _focusNode = FocusNode();                         //um Tastatur zu öffnen, sobald Eingabefeld geöffnet wird
   
 
-  // Anzeigetext der Notiz eig. TextEditingController mit Notiztext als Default; Bearbeitungsmöglichkeit!
+  // TextEditingController bekommt für die Bearbeitung als Defaulttext den Notiztext übergeben
   @override                                                           
   void initState() {
     super.initState();
     _controller.text = widget.text;
   }
 
+  // um den Fokus vom Eingabefeld wieder zu entfernen und die Tastatur zu schließen
   @override
   void dispose() {
     _controller.dispose();
@@ -46,15 +51,17 @@ class _NotizListTileBuilderState extends State<NotizListTileBuilder> {
     super.dispose();
   }
 
+
+  //abhängig davon, ob Notiz gelöscht ist oder nicht, wird ein anderes ListTile gebaut
   @override                                                           
   Widget build(BuildContext context) {
     
     var appState = context.watch<MyAppState>();
-    return widget.geloescht == true 
-      ? _buildPapierkorbListTile(appState) 
-      : _isEditing == true
-        ? _buildEditingListTile(appState)  
-        : _buildNotEditingListTile(appState);
+    return widget.geloescht == true                       //wenn der Lösch-Status der betreffenden Notiz true ist
+      ? _buildPapierkorbListTile(appState)                //dann wird ein PapierkorbListTile gebaut
+      : _isEditing == true                                //falls nicht: Überprüfung, ob Notiz sich im Bearbeitungsmodus befindet
+        ? _buildEditingListTile(appState)                 //falls ja: wird ein EditingListTile gebaut (mit Eingabefeld und Save-Button)
+        : _buildNotEditingListTile(appState);             //falls nein: wird ein NotEditingListTile gebaut (mit Anzeigetext und Edit-Button)
   }
 
 

@@ -3,8 +3,7 @@ import 'dart:convert';                                        // für json-Datei
 import 'package:path_provider/path_provider.dart';            // um Dateispeicherort zu finden und nutzen
 import 'package:uuid/uuid.dart';                              // für id Generierung
 import 'package:flutter/material.dart';                       // für UI
-import 'package:provider/provider.dart';                      // für klassenübergreifenenden Zugriff auf Daten 
-//import 'package:shared_preferences/shared_preferences.dart'; // für dauerhafte Speicherung von Daten     
+import 'package:provider/provider.dart';                      // für klassenübergreifenenden Zugriff auf Daten  
 
 import '../notizen_uebersicht/notizen_uebersicht.dart';       // für Notizenübersicht
 import '../notizen_uebersicht/papierkorb_uebersicht.dart';    // für Papierkorbübersicht
@@ -37,13 +36,13 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 
 class MyAppState extends ChangeNotifier {
-  List<dynamic> notiz = <NotizModel>[];                           // Liste der Notizen (inhalt)
-  List<dynamic> zuletztgeloescht = <NotizModel>[];
-  final Uuid uuid = Uuid();
-  int editingCounter = 0;                                        //Kontrollmittel, um gleichzeitige Notiz-Edits zu verhindern
-  List<String> queue = [];
-  bool isMessengerActive = false;
-  SnackBar? activeSnackbar; // Referenz auf die aktuelle Snackbar
+  List<dynamic> notiz = <NotizModel>[];                           // Liste der Notizen
+  List<dynamic> zuletztgeloescht = <NotizModel>[];                // Liste der zuletzt gelöschten Notizen
+  final Uuid uuid = Uuid();                                       // Instanz von Uuid, um IDs für Notizen zu generieren
+  int editingCounter = 0;                                         //Kontrollmittel, um gleichzeitige Notiz-Edits zu verhindern
+  List<String> queue = [];                                        // Warteschlange für Snackbar Messages ("Neue Notiz erstellt" oder "Keine gleichzeitige Bearbeitung erlaubt")
+  bool isMessengerActive = false;                                 // Bool State, der angibt, ob momentan eine Snackbar aktiv ist
+  SnackBar? activeSnackbar;                                       // Referenz auf die aktuelle Snackbar
 
   //----------------------------------------------------SNACKBAR-MESSENGER----------------------------------------------------------*/
   void snackbarMessenger(BuildContext context, String text) {
@@ -58,8 +57,8 @@ class MyAppState extends ChangeNotifier {
   }
 
   void showNextSnackbar(BuildContext context) {
-    if (queue.isNotEmpty) { // Wenn die Warteschlange nicht leer ist
-      isMessengerActive = true; // Snackbar-Messenger ist aktiv
+    if (queue.isNotEmpty) {                                       // Wenn die Warteschlange nicht leer ist
+      isMessengerActive = true;                                   // Snackbar-Messenger ist aktiv
 
       activeSnackbar = SnackBar(
         content: Text(queue.first),
@@ -67,10 +66,10 @@ class MyAppState extends ChangeNotifier {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(activeSnackbar!).closed.then((_) {
-        queue.removeAt(0); // Erste Nachricht aus der Warteschlange entfernen
-        isMessengerActive = false; // Snackbar-Messenger ist nicht mehr aktiv
-        activeSnackbar = null; // Aktive Snackbar löschen
-        showNextSnackbar(context); // Nächste Snackbar anzeigen
+        queue.removeAt(0);                                        // Erste Nachricht aus der Warteschlange entfernen
+        isMessengerActive = false;                                // Snackbar-Messenger ist nicht mehr aktiv
+        activeSnackbar = null;                                    // Aktive Snackbar löschen
+        showNextSnackbar(context);                                // Nächste Snackbar anzeigen
       });
     }
   }
@@ -146,7 +145,7 @@ class MyAppState extends ChangeNotifier {
   /*--------------------------------------------Papierkorb------------------------------------------------------------*/
   
 
-  //wenn Notizdatei bereits existiert, lade Notizen
+  //wenn Papierkorbdatei bereits existiert, lade Notizen aus papierkorb.json
   Future<void> ladenPapierkorb() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
@@ -163,7 +162,7 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-
+  //Funktion soll zuletztgeloescht[] auslesen und JSON Datei aktualisieren
   Future<void> speicherePapierkorb() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
@@ -179,6 +178,7 @@ class MyAppState extends ChangeNotifier {
     }
   }
 
+  //Funktion soll überprüfen ob papierkorb.json existiert, wenn ja, lösche Datei und leere Array
   Future<void> bereinigePapierkorb() async {
   try {
     final directory = await getApplicationDocumentsDirectory();
@@ -234,7 +234,8 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
-/*----------------------------------------------------------------------------------------------------------*/
+//-----------------------------------------------MYHOMEPAGE-----------------------------------------------------------//
+
 //StatefulWidget nötig, da sich die Startseite entsprechend des selectedIndex ändert (Notizenübersicht, Neue Notiz, Einstellungen)
 
 class MyHomePage extends StatefulWidget {                         //Widget von MyHomePage (quasi gesamter Bildschirm)
@@ -251,6 +252,7 @@ class _MyHomePageState extends State<MyHomePage> {                //State Klasse
   @override
   Widget build(BuildContext context) {
     
+    //je nach ausgewähltem BottomNavigationBar Element wird die entsprechende Seite zugewiesen und neu geladen
     Widget page;
     switch (selectedIndex) {
     case 0:
@@ -263,6 +265,7 @@ class _MyHomePageState extends State<MyHomePage> {                //State Klasse
       throw UnimplementedError('No widget for $selectedIndex');   //Just in case
     }
 
+    //variable mainArea wird erstellt, welche die sich dynamisch ändernde Startseite (page) enthält
     var mainArea = ColoredBox(
       color: Theme.of(context).colorScheme.primary,
       child: Container(
@@ -278,7 +281,7 @@ class _MyHomePageState extends State<MyHomePage> {                //State Klasse
           builder: (context, constraints) {
             return Column(
               children: [
-                Expanded(child: mainArea),
+                Expanded(child: mainArea),                    //mainArea wird in Spalte eingefügt, AppBar ist in Seiten enthalten
               ],
             );
           },
@@ -287,7 +290,7 @@ class _MyHomePageState extends State<MyHomePage> {                //State Klasse
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: Color.fromARGB(255, 167, 213, 255),
           items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(                          //Notizenübesicht, Startseite
+            BottomNavigationBarItem(                          //Notizenübesicht, Startseite (default)
               icon: Icon(Icons.menu),         
               label: 'Notizen',
             ),

@@ -1,10 +1,12 @@
+//Erstellt eine ListView mit allen Notizen, die in der Liste zuletztgeloescht in main.dart gespeichert sind
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
 import '../notizen_builder/notiz_listtile_builder.dart';
 
-/*----------------------------------NOTIZEN WIDGET GENERATOR-------------------------------------*/
+/*----------------------------------PAPIERKORB WIDGET GENERATOR-------------------------------------*/
  
 
 class PapierkorbListe extends StatefulWidget {
@@ -21,10 +23,11 @@ class _PapierkorbListeState extends State<PapierkorbListe> {
   }
 
   Widget _buildPapierkorbListe(MyAppState appState) {
-    List<dynamic> papierkorb = appState.zuletztgeloescht;            //Liste mit Notizen
+    List<dynamic> papierkorb = appState.zuletztgeloescht;            //Lokale Kopie der Notizen aus appState.zuletztgeloescht (main.dart)
     
     Widget papierkorbListe = papierkorb.isEmpty == true              //Wenn überhaupt gar keine Notizen vorhanden sind
         
+        //------------------------------------------------LEERES FELD MIT TEXT-----------------------------------------------//
         ? SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
             child: Column(
@@ -46,33 +49,21 @@ class _PapierkorbListeState extends State<PapierkorbListe> {
             ),
           )
         
-        : ListView.separated(                               //Notizen mit runder Checkbox davor anzeigen
+        //------------------------------------------------LISTVIEW ALLER NOTIZEN IM PAPIERKORB-----------------------------------------------/
+        : ListView.separated(                               //Listview mit Trennstrichen zwischen den einzelnen Notizen
             shrinkWrap: true,
             physics: BouncingScrollPhysics(),
-            itemCount: papierkorb.length,
+            itemCount: papierkorb.length,                   //Anzahl der Listtiles = Anzahl der Notizen in appState.zuletztgeloescht[]
             itemBuilder: (context, index) {
-              return NotizListTileBuilder(                // Übergabe von Listenelement Parametern an NotizListTileBuilder
+              return NotizListTileBuilder(                  // Übergabe von Listenelement Parametern an NotizListTileBuilder
                 id: papierkorb[index].id,
                 text: papierkorb[index].text,
                 geloescht: papierkorb[index].geloescht,
               );
             },
-            separatorBuilder: (BuildContext context, int index) => const Divider(),
+            separatorBuilder: (BuildContext context, int index) => const Divider(),       //für die Trennstriche
           );
     
     return papierkorbListe;
   }
 }
-
-
-/*ListView.builder(                                     //Notizen mit runder Checkbox davor anzeigen
-            shrinkWrap: true,
-            physics: BouncingScrollPhysics(),
-            itemCount: papierkorb.length,
-            itemBuilder: (context, index) {
-              NotizModel geloeschteNotiz = papierkorb[index];
-              return NotizModelBuilder(
-                notiz: geloeschteNotiz,                            // Übergabe vo Listenelement an NotizModelBuilder
-              );
-            },
-          );*/

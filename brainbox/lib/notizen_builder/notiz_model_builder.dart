@@ -1,4 +1,6 @@
-// Struktur zum Abspeichern im Array Notiz (MyAppState) mit id, text und geloescht
+// Struktur zum Generieren und Abspeichern neu erstellter Notizen im Array Notiz (MyAppState) mit id, text und geloescht
+// mögliche Erweiterungen: Datum + Uhrzeit, Priorität, Schriftart + Schriftgröße, Bild, Audio, Link etc.
+
 class NotizModel {
   final String id;
   late String text;

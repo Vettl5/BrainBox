@@ -1,4 +1,4 @@
-//Notizenübersicht auf Homescreen
+//Notizenübersicht auf Homescreen, in der alle ListTiles der Notizen gemeinsam angezeigt werden
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,47 +18,16 @@ class NotizenUebersicht extends StatefulWidget {
 class _NotizenUebState extends State<NotizenUebersicht> { 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
-  List<String> queue = [];
-  bool isMessengerActive = false;
-  SnackBar? activeSnackbar; // Referenz auf die aktuelle Snackbar
-
-  //----------------------------------------------------SNACKBAR-MESSENGER----------------------------------------------------------*/
-  void snackbarMessenger(BuildContext context, String text) {
-    queue.add(text); // Text zur Warteschlange hinzufügen
-
-    if (!isMessengerActive) { // Wenn der Snackbar-Messenger nicht aktiv ist
-      showNextSnackbar(context); // Nächste Snackbar anzeigen
-    } else {
-      // Wenn der Snackbar-Messenger aktiv ist, wird die aktuelle Snackbar sofort geschlossen und die neue Snackbar wird angezeigt
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    }
-  }
-
-  void showNextSnackbar(BuildContext context) {
-    if (queue.isNotEmpty) { // Wenn die Warteschlange nicht leer ist
-      isMessengerActive = true; // Snackbar-Messenger ist aktiv
-
-      activeSnackbar = SnackBar(
-        content: Text(queue.first),
-        duration: Duration(milliseconds: 5000),
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(activeSnackbar!).closed.then((_) {
-        queue.removeAt(0); // Erste Nachricht aus der Warteschlange entfernen
-        isMessengerActive = false; // Snackbar-Messenger ist nicht mehr aktiv
-        activeSnackbar = null; // Aktive Snackbar löschen
-        showNextSnackbar(context); // Nächste Snackbar anzeigen
-      });
-    }
-  }
 
 
 //----------------------------------------------------NOTIZENERSTELLUNG INITIIEREN----------------------------------------------------------*/
+  
+  //Wenn eingegebener Text den Vorgaben entspricht, wird die Notiz erstellt, der Text aus dem Eingabefeld gelöscht und PopUp geschlossen
   void submitForm(MyAppState appState, BuildContext context) {
     if (_formKey.currentState!.validate()) {
       final text = _nameController.text;
       appState.hinzufuegenNotiz(text);
-      snackbarMessenger(context, 'Notiz erstellt!');
+      appState.snackbarMessenger(context, 'Notiz erstellt!');
       _nameController.clear();
       Navigator.of(context).pop();
     }
@@ -72,7 +41,7 @@ class _NotizenUebState extends State<NotizenUebersicht> {
   }
 
   Widget _buildNotizenListe(MyAppState appState) {
-    /*--------------------------------------------------------LISTVIEW-----------------------------------------------------------*/
+    /*--------------------------------------------------------APPBAR-----------------------------------------------------------*/
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
@@ -86,11 +55,14 @@ class _NotizenUebState extends State<NotizenUebersicht> {
                 centerTitle: true, // Text wird in der Mitte zentriert
                 backgroundColor: Theme.of(context).colorScheme.primary,
               ),
+
+      /*--------------------------------------------------------LISTVIEW-----------------------------------------------------------*/
       body: Padding(
         padding: const EdgeInsets.only(top: 8.0),         // Um Abstand zw. oberster Notiz und AppBar zu gewährleisten
-        child: Stack(
+        child: Stack(                                     // Übereinanderstapelung von Notizenliste und Fadeout-Effekt
           children: [
-            NotizenListTiles(),                            // Generierung der Notizenliste durch externen Code
+            // Generierung der Notizenliste in widget_notizenliste.dart
+            NotizenListTiles(),
 
             // Fadeout-Effekt am unteren Rand der Notizenliste
             Positioned(
@@ -115,6 +87,8 @@ class _NotizenUebState extends State<NotizenUebersicht> {
         ),
       ),
 
+      /*--------------------------------------------------------FAB-----------------------------------------------------------*/
+      // Floating Action Button zum Hinzufügen einer neuen Notiz
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).colorScheme.primary,
         child: Icon(
@@ -127,7 +101,7 @@ class _NotizenUebState extends State<NotizenUebersicht> {
             builder: (_) => AlertDialog(
               title: Text('Notiz hinzufügen'),
               content: SizedBox(
-                width: 300, // Legen Sie die gewünschte Breite fest
+                width: 300,
                 child: Form(
                   key: _formKey,
                   child: Padding(
@@ -161,12 +135,12 @@ class _NotizenUebState extends State<NotizenUebersicht> {
                 TextButton(
                   child: Text('Erstellen'),                         //Erstellen Button
                   onPressed: () {
-                    submitForm(appState, context);                           //Gültigkeit der Eingabe wird geprüft
+                    submitForm(appState, context);                  //Gültigkeit der Eingabe wird geprüft
                   },
                 ),
               ],
             ),
-            barrierDismissible: false,                              //Dialog kann nicht durch Klicken außerhalb geschlossen werden
+            barrierDismissible: false,                              //Dialog kann nicht durch Klicken außerhalb des PopUp's geschlossen werden
           );
         },
       ),

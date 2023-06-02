@@ -24,9 +24,11 @@ class _PapierkorbUebState extends State<PapierkorbUebersicht> {
   }
 
   Widget buildPapierkorbListe(MyAppState appState) {
-    /*--------------------------------------------------------LISTVIEW-----------------------------------------------------------*/
+    
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
+
+      /*--------------------------------------------------------APPBAR-----------------------------------------------------------*/
       appBar: AppBar(
                 title: const Text('Gelöschte Notizen', 
                   style: TextStyle(
@@ -73,7 +75,10 @@ class _PapierkorbUebState extends State<PapierkorbUebersicht> {
                 ],
                 backgroundColor: Theme.of(context).colorScheme.primary,
               ),
-      body: PapierkorbListe(),                     //Generierung der Notizenliste
+
+      /*--------------------------------------------------------LISTVIEW-----------------------------------------------------------*/
+      // Generierung der Papierkorbliste in widget_papierkorbliste.dart       
+      body: PapierkorbListe(),
     );
   }
 }
