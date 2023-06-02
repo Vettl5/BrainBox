@@ -1,7 +1,9 @@
+ÜBER DIE APP
+
 Diese App wurde im Rahmen eines Uni-Projektes angelegt und programmiert.
 Im Grunde ist es eine einfache Notizenapp, in der man neue Notizen anlegen kann und sie ebenfalls bearbeiten oder löschen kann. Es gab anfangs verschiedene Ideen, wie diese App umgesetzt werden könnte und welche Funktionen sie darüber hinaus beinhalten könnte. Ursprünglich sollte mit jeder neu erstellten Notiz eine neue Notizdatei generiert werden, die beim öffnen einen Arbeitsbereich bietet für bulletpoints, lange Texte oder Checklisten. Allerdings wurde dieser Ansatz im Laufe der Zeit verworfen auf Grund von Komplexität und Zeit.
 
-Es gibt 2 Pages: die Notizenübersicht und eine Papierkorbübersicht. In der Notizenübersicht befinden sich alle erstellten Notizen in chronologischer Reihenfolge ihrer Erstellung. Jede Notiz besitzt einen Bulletpoint,  einen Text (vom Nutzer vergeben) und einen Edit-Button. Wenn der Edit-Button gedrückt wurde, wird der Text zu einem Eingabefeld, das standardmäßig den Text der Notiz beinhaltet. Von hier aus kann man den Text bearbeiten. Der Edit-Button ist nun ein Speicher-Button und kann betätigt werden, wenn man seine Änderungen am Notizentext bestätigen möchte. Falls der Bulletpoint einer Notiz betätigt wird, wird die betreffende Notiz in den Papierkorb verschoben und verschwindet aus der Notizenübersicht. In der Papierkorbübersicht hat man dann die Möglichkeit, gelöschte Notizen durch betätigen der Bulletpoints wiederherzustellen oder alle Notizen permanent zu löschen.
+Es gibt 2 Pages: eine Notizenübersicht und eine Papierkorbübersicht. In der Notizenübersicht befinden sich alle erstellten Notizen in chronologischer Reihenfolge ihrer Erstellung. Jede Notiz besitzt einen Bulletpoint,  einen Text (vom Nutzer vergeben) und einen Edit-Button. Wenn der Edit-Button gedrückt wurde, wird der Text zu einem Eingabefeld, das standardmäßig den Text der Notiz beinhaltet. Von hier aus kann man den Text bearbeiten. Der Edit-Button ist nun ein Speicher-Button und kann betätigt werden, wenn man seine Änderungen am Notizentext bestätigen möchte. Falls der Bulletpoint einer Notiz betätigt wird, wird die betreffende Notiz in den Papierkorb verschoben und verschwindet aus der Notizenübersicht. In der Papierkorbübersicht hat man dann die Möglichkeit, gelöschte Notizen durch betätigen der Bulletpoints wiederherzustellen oder alle Notizen permanent zu löschen.
 
 Um eine neue Notiz anzulegen gibt es einen Floating Action Button in der rechten unteren Ecke der Notizenübersicht. Wenn dieser angetippt wird, öffnet sich ein PopUp Fenster mit einer Eingabezeile und den Optionen "Abbrechen" oder "Bestätigen". Ein Schließen des PopUps durch Klicken in den Außenbereich ist nicht möglich, um versehentliches Abbrechen der Eingabe zu verhindern. Ein leeres Eingabefeld wird nicht akzeptiert und durch eine rote Fehlermeldung markiert.
 
@@ -30,3 +32,17 @@ NICE TO HAVE:
 - disappear-Animation für gelöschte/wiederhergestellte Notizen, um visuell Feedback über Verbleib der Notiz zu geben
 - mögliche Deadline Datumsangabe für eine Notiz, die man bei der Erstellung angeben kann
 -> anschließend an diese Erweiterung könnte man eine Benachrichtigung in der Benachrichtigungsleiste anzeigen lassen, sobald die Deadline in einem bestimmten Zeitraum erreicht wird ("Fällig in 3 Tagen: Steuer einreichen!")
+
+Im Betrieb erkannte Leistungsprobleme:
+- während man eine Notiz bearbeitet, kann der Floating Action Button betätigt werden, um eine neue Notiz anzulegen. Während der Bearbeitung einer Notiz sollte das nicht erlaubt sein
+- in seltenen Fällen kann es vorkommen, dass wenn eine Notiz nach mehrmaligem antippen des Bulletpoints erst in den Papierkorb verschoben wird, diese Notiz mehrmals in den Papierkorb verschoben wurde (praktisch Duplizierung einer einzelnen Notiz)
+- Bulletpoint Feld sollte vergrößert werden (nicht sichtbar), um ungenaue Tippeingaben abzufangen
+
+INSTALLATION DER APP
+BrainBox wurde unter Windows 10 in MS Visual Studio Code programmiert in Verbindung mit Flutter Extensions und Android Studio. Folgen Sie der Installationsanleitung unter https://docs.flutter.dev/get-started/install. Nach dem alle Installationsschritte befolgt wurden, die SDK in VS Code eingebunden und das Repository geforkt wurde können sie die App im Emulator ausführen.
+
+Zum Testen im Programmierbetrieb wurde ein Google Pixel 6 Pro mit Android 8.0 Oreo Emulator verwendet. Alle Android Version von 8.0 an aufwärts sollten definitiv kompatibel mit der App sein, darunter wurde nicht getestet.
+
+Zur Installation der App auf einem physischen Gerät mit entsprechenden Eigenschaften folgen sie dieser Anleitung unter dem Punkt "Build an APK" und anschließend "Install an APK on a device":
+https://docs.flutter.dev/deployment/android#building-the-app-for-release
+Beachten Sie, dass der Developer Modus in den Android Einstellungen aktiviert werden muss inkl. USB Debugging, um die APK erfolgreich installieren zu können.
