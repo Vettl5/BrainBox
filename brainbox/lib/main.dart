@@ -37,9 +37,43 @@ class MyApp extends StatelessWidget {                             //Definiert ei
 
 
 class MyAppState extends ChangeNotifier {
-  List<dynamic> notiz = <NotizModel>[];                          // Liste der Notizen (inhalt)
+  List<dynamic> notiz = <NotizModel>[];                           // Liste der Notizen (inhalt)
   List<dynamic> zuletztgeloescht = <NotizModel>[];
   final Uuid uuid = Uuid();
+  int editingCounter = 0;                                        //Kontrollmittel, um gleichzeitige Notiz-Edits zu verhindern
+  List<String> queue = [];
+  bool isMessengerActive = false;
+  SnackBar? activeSnackbar; // Referenz auf die aktuelle Snackbar
+
+  //----------------------------------------------------SNACKBAR-MESSENGER----------------------------------------------------------*/
+  void snackbarMessenger(BuildContext context, String text) {
+    queue.add(text); // Text zur Warteschlange hinzufügen
+
+    if (!isMessengerActive) { // Wenn der Snackbar-Messenger nicht aktiv ist
+      showNextSnackbar(context); // Nächste Snackbar anzeigen
+    } else {
+      // Wenn der Snackbar-Messenger aktiv ist, wird die aktuelle Snackbar sofort geschlossen und die neue Snackbar wird angezeigt
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    }
+  }
+
+  void showNextSnackbar(BuildContext context) {
+    if (queue.isNotEmpty) { // Wenn die Warteschlange nicht leer ist
+      isMessengerActive = true; // Snackbar-Messenger ist aktiv
+
+      activeSnackbar = SnackBar(
+        content: Text(queue.first),
+        duration: Duration(milliseconds: 1500),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(activeSnackbar!).closed.then((_) {
+        queue.removeAt(0); // Erste Nachricht aus der Warteschlange entfernen
+        isMessengerActive = false; // Snackbar-Messenger ist nicht mehr aktiv
+        activeSnackbar = null; // Aktive Snackbar löschen
+        showNextSnackbar(context); // Nächste Snackbar anzeigen
+      });
+    }
+  }
 
   /*--------------------------------------------Notizen--------------------------------------------------------------*/
   Future<void> checkIfNotizExists() async {

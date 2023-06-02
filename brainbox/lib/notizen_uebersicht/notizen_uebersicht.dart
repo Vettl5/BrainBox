@@ -18,21 +18,52 @@ class NotizenUebersicht extends StatefulWidget {
 class _NotizenUebState extends State<NotizenUebersicht> { 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
+  List<String> queue = [];
+  bool isMessengerActive = false;
+  SnackBar? activeSnackbar; // Referenz auf die aktuelle Snackbar
 
-  void submitForm(MyAppState appState) {
+  //----------------------------------------------------SNACKBAR-MESSENGER----------------------------------------------------------*/
+  void snackbarMessenger(BuildContext context, String text) {
+    queue.add(text); // Text zur Warteschlange hinzufügen
+
+    if (!isMessengerActive) { // Wenn der Snackbar-Messenger nicht aktiv ist
+      showNextSnackbar(context); // Nächste Snackbar anzeigen
+    } else {
+      // Wenn der Snackbar-Messenger aktiv ist, wird die aktuelle Snackbar sofort geschlossen und die neue Snackbar wird angezeigt
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    }
+  }
+
+  void showNextSnackbar(BuildContext context) {
+    if (queue.isNotEmpty) { // Wenn die Warteschlange nicht leer ist
+      isMessengerActive = true; // Snackbar-Messenger ist aktiv
+
+      activeSnackbar = SnackBar(
+        content: Text(queue.first),
+        duration: Duration(milliseconds: 5000),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(activeSnackbar!).closed.then((_) {
+        queue.removeAt(0); // Erste Nachricht aus der Warteschlange entfernen
+        isMessengerActive = false; // Snackbar-Messenger ist nicht mehr aktiv
+        activeSnackbar = null; // Aktive Snackbar löschen
+        showNextSnackbar(context); // Nächste Snackbar anzeigen
+      });
+    }
+  }
+
+
+//----------------------------------------------------NOTIZENERSTELLUNG INITIIEREN----------------------------------------------------------*/
+  void submitForm(MyAppState appState, BuildContext context) {
     if (_formKey.currentState!.validate()) {
       final text = _nameController.text;
       appState.hinzufuegenNotiz(text);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Notiz erstellt!'),
-          duration: Duration(milliseconds: 1500),
-        ),
-      );
+      snackbarMessenger(context, 'Notiz erstellt!');
       _nameController.clear();
       Navigator.of(context).pop();
     }
   }
+
 
   @override
   Widget build(BuildContext context) { 
@@ -55,7 +86,34 @@ class _NotizenUebState extends State<NotizenUebersicht> {
                 centerTitle: true, // Text wird in der Mitte zentriert
                 backgroundColor: Theme.of(context).colorScheme.primary,
               ),
-      body: NotizenListTile(),                   //Generierung der Notizenliste
+      body: Padding(
+        padding: const EdgeInsets.only(top: 8.0),         // Um Abstand zw. oberster Notiz und AppBar zu gewährleisten
+        child: Stack(
+          children: [
+            NotizenListTiles(),                            // Generierung der Notizenliste durch externen Code
+
+            // Fadeout-Effekt am unteren Rand der Notizenliste
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 70,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      Theme.of(context).colorScheme.background.withOpacity(1),
+                      Theme.of(context).colorScheme.background.withOpacity(0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
 
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -94,75 +152,24 @@ class _NotizenUebState extends State<NotizenUebersicht> {
               
               actions: [
                 TextButton(
-                  child: Text('Abbrechen'),
+                  child: Text('Abbrechen'),                         //Abbrechen Button
                   onPressed: () {
-                    _nameController.clear();
-                    Navigator.of(context).pop();
+                    _nameController.clear();                        //Textfeld wird geleert, damit bei Neuaufruf kein alter Text angezeigt wird           
+                    Navigator.of(context).pop();                    //Dialog wird geschlossen
                   },
                 ),
                 TextButton(
-                  child: Text('Erstellen'),
+                  child: Text('Erstellen'),                         //Erstellen Button
                   onPressed: () {
-                    submitForm(appState);                                        //Gültigkeit der Eingabe wird geprüft
+                    submitForm(appState, context);                           //Gültigkeit der Eingabe wird geprüft
                   },
                 ),
               ],
             ),
-            barrierDismissible: false,
+            barrierDismissible: false,                              //Dialog kann nicht durch Klicken außerhalb geschlossen werden
           );
         },
       ),
     );
   }
 }
-
-/*return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return Column(
-            children: [
-              AppBar(
-                title: const Text('BrainBox', 
-                  style: TextStyle(
-                    fontSize: 30, 
-                    fontWeight: FontWeight.bold, 
-                    color: Colors.white,
-                  ),
-                ),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                actions: [
-                  IconButton(                                                                     //Optionmenü Button
-                    icon: const Icon(Icons.more_vert, size: 30, color: Colors.white),
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return SizedBox(
-                            height: 200,
-                            child: Column(
-                              children: [
-                                //Papierkorb öffnen:
-                                ListTile(
-                                  leading: Icon(Icons.delete),
-                                  title: Text('Gelöschte Notizen wiederherstellen'),
-                                  onTap: () {
-                                    widget.onToggleIndex(1);    // Aufruf der Callback-Funktion
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  )
-                ],
-              ),
-              NotizenListe(),                     //Generierung der Notizenliste
-            ],
-          );
-        },
-      ),
-    );*/

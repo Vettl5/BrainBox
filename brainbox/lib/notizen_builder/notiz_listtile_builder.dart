@@ -1,5 +1,6 @@
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 import '../main.dart';
 import 'notiz_model_builder.dart';
@@ -29,6 +30,7 @@ class _NotizListTileBuilderState extends State<NotizListTileBuilder> {
   bool _isEditing = false;
   TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  
 
   // Anzeigetext der Notiz eig. TextEditingController mit Notiztext als Default; Bearbeitungsmöglichkeit!
   @override                                                           
@@ -46,6 +48,7 @@ class _NotizListTileBuilderState extends State<NotizListTileBuilder> {
 
   @override                                                           
   Widget build(BuildContext context) {
+    
     var appState = context.watch<MyAppState>();
     return widget.geloescht == true 
       ? _buildPapierkorbListTile(appState) 
@@ -149,11 +152,19 @@ class _NotizListTileBuilderState extends State<NotizListTileBuilder> {
     trailing: IconButton(
       icon: Icon(Icons.edit),
       onPressed: () {
-        setState(() {
-          _isEditing = true;
-          _focusNode.requestFocus(); // Fokus auf das Textfeld setzen
-        });
+        if (appState.editingCounter == 0) {
+          appState.editingCounter = 1;
+          setState(() {
+            _isEditing = true;
+            _focusNode.requestFocus();
+          });
+          }
+        else {
+          _isEditing = false;
+          appState.snackbarMessenger(context, 'Es kann nur eine Notiz gleichzeitig bearbeitet werden!');
+        }
       },
+
     ),
   );
 }
@@ -163,19 +174,6 @@ class _NotizListTileBuilderState extends State<NotizListTileBuilder> {
 /*-----------------------------------------------------Notiz im Bearbeiten Modus-----------------------------------------------------*/
   Widget _buildEditingListTile(MyAppState appState) {
     
-    TextStyle textStyle = TextStyle(
-      fontSize: 20,
-      fontWeight: FontWeight.bold,
-    );
-
-    if (widget.geloescht) {
-      textStyle = textStyle.copyWith(
-        decoration: TextDecoration.lineThrough,
-        color: Colors.grey,
-      );
-    }
-
-
     return ListTile(
       onTap: () {
         _focusNode.requestFocus(); // Fokus auf das Textfeld setzen
@@ -208,6 +206,7 @@ class _NotizListTileBuilderState extends State<NotizListTileBuilder> {
               appState.notiz[foundIndex] = updatedNotiz;
             }
             _isEditing = false;
+            appState.editingCounter = 0;
             appState.speichereNotizen();
           });
         },

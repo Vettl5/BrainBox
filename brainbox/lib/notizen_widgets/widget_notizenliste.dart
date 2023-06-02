@@ -5,15 +5,14 @@ import '../main.dart';
 import '../notizen_builder/notiz_listtile_builder.dart';
 
 /*----------------------------------NOTIZEN WIDGET GENERATOR-------------------------------------*/
- 
 
-class NotizenListTile extends StatefulWidget {
-  const NotizenListTile({super.key});
+class NotizenListTiles extends StatefulWidget {
+  const NotizenListTiles({super.key});
   @override
-  State<NotizenListTile> createState() => _NotizenListTileState();
+  State<NotizenListTiles> createState() => _NotizenListTilesState();
 }
 
-class _NotizenListTileState extends State<NotizenListTile> {
+class _NotizenListTilesState extends State<NotizenListTiles> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
