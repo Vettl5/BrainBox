@@ -5,7 +5,7 @@ Es gibt 2 Pages: die Notizenübersicht und eine Papierkorbübersicht. In der Not
 
 Um eine neue Notiz anzulegen gibt es einen Floating Action Button in der rechten unteren Ecke der Notizenübersicht. Wenn dieser angetippt wird, öffnet sich ein PopUp Fenster mit einer Eingabezeile und den Optionen "Abbrechen" oder "Bestätigen". Ein Schließen des PopUps durch Klicken in den Außenbereich ist nicht möglich, um versehentliches Abbrechen der Eingabe zu verhindern. Ein leeres Eingabefeld wird nicht akzeptiert und durch eine rote Fehlermeldung markiert.
 
-Als kleiner Zusatz wurde noch ein Fadeout am unteren Bildschirmrand eingefügt, um die Notizen nach unten hin verblassen zu lassen. Dies hat nur einen visuellen Effekt.
+Als kleiner Zusatz wurde noch ein Fadeout am unteren Bildschirmrand eingefügt, um die Notizen nach unten hin verblassen zu lassen. Dies hat nur einen visuellen Effekt. Grundsätzlich fehlt bisher eine Sortier- oder Filterfunktion der Notizen in irgendeiner Form.
 
 NOCH AUSSTEHENDE ERWEITERUNGEN:
 NÜTZLICH:
