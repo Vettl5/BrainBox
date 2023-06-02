@@ -9,15 +9,20 @@ Als kleiner Zusatz wurde noch ein Fadeout am unteren Bildschirmrand eingefügt, 
 
 NOCH AUSSTEHENDE ERWEITERUNGEN:
 NÜTZLICH:
-- wenn sich Text über mehrere Zeilen erstreckt, dann könnte die Schriftgröße verkleinert werden um Platz zu sparen
-und übersichtlicher zu wirken
+- wenn sich Text über mehrere Zeilen erstreckt, dann könnte die Schriftgröße verkleinert werden um Platz zu sparen und übersichtlicher zu wirken
+- Sortier- bzw. Filterfunktionen fehlen noch, erfordern weitere Notizattribute
 - Notizen besitzen noch kein Zeitattribut
     -> wenn sie Zeitattribut besitzen kann man Erstellzeitpunkt mit einblenden
     -> Notizen können noch nicht nach Erstellzeitpunkt sortiert werden oder 
     nach Wiederherstellen aus Papierkorb an entsprechender Stelle einsortiert werden
-    -> daraus resultierend: Sortierfunktion
-    -> gelöschte Notizen werden noch nicht nach bestimmten Zeitraum permanent aus Speicher gelöscht
-- Querformatfunktionalität fehlt bisher -> Querformat funktioniert, allerdings rutscht NavBar noch nicht zur Seite
+    -> daraus resultierend: Sortierfunktion ("Neueste/Älteste zuerst")
+    -> daraus resultierend: Filterfunktion ("alle Notizen, die ab 01. Januar erstellt wurden")
+- gelöschte Notizen werden noch nicht nach bestimmten Zeitraum permanent aus Speicher gelöscht
+- Notizen besitzen bisher noch keine Priotitäten
+    -> Prioritätenattribut zu jeder Notiz
+    -> daraus resultierend: Sortierfunktion ("Wichtige Notizen zuerst", "Absteigend nach Priorität")
+    -> daraus resultierend: Filterfunktion ("Nur wichtige Notizen anzeigen")
+- Querformatfunktionalität fehlt bisher -> Querformat funktioniert, allerdings rutscht NavBar noch nicht zur Seite und "Neue Notiz"-Popup löst Pixel Overflow beim Öffnen der Tastatur aus
 
 NICE TO HAVE:
 - App-Widget noch default Flutter Icon
