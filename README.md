@@ -20,6 +20,7 @@ Als kleiner Zusatz wurde noch ein Fadeout am unteren Bildschirmrand eingefügt, 
 - "Neue Notiz"-Button über oberster Notiz als eigenes Zeilenelement, und wenn gerade nicht sichtbar, dann soll wieder rechts unten das Plus zu sehen sein
 - Bulletpoints für Löschfunktionalität werden durch Swipebewegung von links nach rechts ersetzt, um Notizen in Papierkorb zu verschieben
 - Notizen könnten (unabhängig von ihren Prioritäten) nach oben oder untern verschoben werden (Auswahl-Optionsmenü einrichten und Sidemarker rechts an den Notizen zum grabben und verschieben einblenden + Bulletpoints für weitere Optionen links; Bulletpoints: erst möglich, wenn Swipebewegung zum Löschen die bisherigen Bulletpoints abgelöst hat
+-> ALTERNATIVE: lang auf eine Notiz tippen und halten, um sie nach oben/unten zu verschieben. Zusätzliches Optionsmenü oben rechts, um u.a. Auswahlansicht mit Bulletpoints für Notizen zu aktivieren
 
 ### Funktionalitätsprobleme:
 - Sortier- bzw. Filterfunktionen fehlen noch, erfordern weitere Notizattribute
