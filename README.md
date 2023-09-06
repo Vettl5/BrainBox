@@ -42,6 +42,10 @@ Als kleiner Zusatz wurde noch ein Fadeout am unteren Bildschirmrand eingefügt, 
 - disappear-Animation für gelöschte/wiederhergestellte Notizen, um visuell Feedback über Verbleib der Notiz zu geben
 - mögliche Deadline Datumsangabe für eine Notiz, die man bei der Erstellung angeben kann
 -> anschließend an diese Erweiterung könnte man eine Benachrichtigung in der Benachrichtigungsleiste anzeigen lassen, sobald die Deadline in einem bestimmten Zeitraum erreicht wird ("Fällig in 3 Tagen: Steuer einreichen!")
+- Informationsabschnitt für Appversionsinfo, Releasedatum, Creator, Link zum Github Repository etc. ("Über diese App")
+- Notizgruppen (Schule, Kinder, Trainingspläne, Uni, Essensplanung, Urlaubsplanung, Umzug, etc.) als auswählbare Rubriken am unteren Bildschirmrand über der Navbar
+- einzelne Notizen als Text teilen, mehrere Notizen als Textdokument in "zeitgemäßer" Form exportieren & teilbar machen
+- "2. Dimension" - bisherige Notizen lediglich als Dokumententitel für dahinter befindliche Dokumente nutzen (ursprüngliche Idee umsetzen!)
 
 ## Im Betrieb erkannte Leistungsprobleme:
 
