@@ -14,8 +14,13 @@ Als kleiner Zusatz wurde noch ein Fadeout am unteren Bildschirmrand eingefügt, 
 
 # NOCH AUSSTEHENDE ERWEITERUNGEN / FIXES:
 ## NÜTZLICH:
+
+### Designprobleme:
 - wenn sich Text über mehrere Zeilen erstreckt, dann könnte die Schriftgröße verkleinert werden um Platz zu sparen und übersichtlicher zu wirken
-- Bulletpoints für Löschfunktionalität werden durch Swipebewegung von links nach rechts ersetzt, um Notizen in Papierkorb zu verschieben 
+- "Neue Notiz"-Button über oberster Notiz als eigenes Zeilenelement, und wenn gerade nicht sichtbar, dann soll wieder rechts unten das Plus zu sehen sein
+- Bulletpoints für Löschfunktionalität werden durch Swipebewegung von links nach rechts ersetzt, um Notizen in Papierkorb zu verschieben
+
+### Funktionalitätsprobleme:
 - Sortier- bzw. Filterfunktionen fehlen noch, erfordern weitere Notizattribute
 - Notizen besitzen noch kein Zeitattribut
     -> wenn sie Zeitattribut besitzen kann man Erstellzeitpunkt mit einblenden
@@ -39,6 +44,10 @@ Als kleiner Zusatz wurde noch ein Fadeout am unteren Bildschirmrand eingefügt, 
 
 ## Im Betrieb erkannte Leistungsprobleme:
 - während man eine Notiz bearbeitet, kann der Floating Action Button betätigt werden, um eine neue Notiz anzulegen. Während der Bearbeitung einer Notiz sollte das nicht erlaubt sein
+- andere Notizen können während des Bearbeitens einer Notiz noch gelöscht werden
+- neue Notizen können während des Bearbeitens einer Notiz erstellt werden
+- im Bearbeitungszustand: Notiz hat keinen Mindestabstand zur Tastatur/rutscht nicht auf Tastaturniveau hoch (wichtig für unteren Notizen)
+- Papierkorb-Icon soll nicht angezeigt werden, wenn keine Notizen im Papierkorb sind 
 - in seltenen Fällen kann es vorkommen, dass wenn eine Notiz nach mehrmaligem antippen des Bulletpoints erst in den Papierkorb verschoben wird, diese Notiz mehrmals in den Papierkorb verschoben wurde (praktisch Duplizierung einer einzelnen Notiz)
     -> mögliche Lösung: zum Löschen ausgewählte Notizen werden in Queue verschoben, die ca. 2 Sekunden nach dem die letzte Notiz gequeued wurde die Notizen gesammelt in den Papierkorb verschiebt. Fehler durch mehrmaliges inqueuen werden durch Queue Bedingungen abgefangen (wichtigste Bedingung: es dürfen keine Notizen mit der selben ID in die Queue verschoben werden). Positiver Nebeneffekt: ressourceneffizienter/weniger rechenintensiv durch weniger Dateiarbeit
 - Bulletpoint Feld zum Löschen und Wiederherstellen der Notizen sollte vergrößert werden (nicht sichtbar), um ungenaue Tippeingaben abzufangen
