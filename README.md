@@ -13,18 +13,11 @@ Um eine neue Notiz anzulegen gibt es einen Floating Action Button in der rechten
 Als kleiner Zusatz wurde noch ein Fadeout am unteren Bildschirmrand eingefügt, um die Notizen nach unten hin verblassen zu lassen. Dies hat nur einen visuellen Effekt. Grundsätzlich fehlt bisher eine Sortier- oder Filterfunktion der Notizen in irgendeiner Form.
 
 # NOCH AUSSTEHENDE ERWEITERUNGEN / FIXES:
-## NÜTZLICH:
-
-### Designprobleme:
-- wenn sich Text über mehrere Zeilen erstreckt, dann könnte die Schriftgröße verkleinert werden um Platz zu sparen und übersichtlicher zu wirken
-- "Neue Notiz"-Button über oberster Notiz als eigenes Zeilenelement, und wenn gerade nicht sichtbar, dann soll wieder rechts unten das Plus zu sehen sein
-- Bulletpoints für Löschfunktionalität werden durch Swipebewegung von links nach rechts ersetzt, um Notizen in Papierkorb zu verschieben
-- Notizen könnten (unabhängig von ihren Prioritäten) nach oben oder untern verschoben werden (Auswahl-Optionsmenü einrichten und Sidemarker rechts an den Notizen zum grabben und verschieben einblenden + Bulletpoints für weitere Optionen links; Bulletpoints: erst möglich, wenn Swipebewegung zum Löschen die bisherigen Bulletpoints abgelöst hat
--> ALTERNATIVE: lang auf eine Notiz tippen und halten, um sie nach oben/unten zu verschieben. Zusätzliches Optionsmenü oben rechts, um u.a. Auswahlansicht mit Bulletpoints für Notizen zu aktivieren
-
+## TO FIX:
 ### Funktionalitätsprobleme:
+- Querformatfunktionalität fehlt bisher -> Querformat funktioniert, allerdings rutscht NavBar noch nicht zur Seite und "Neue Notiz"-Popup löst Pixel Overflow beim Öffnen der Tastatur aus
 - Sortier- bzw. Filterfunktionen fehlen noch, erfordern weitere Notizattribute
-- Notizen besitzen noch kein Zeitattribut
+- Notizen besitzen noch keine Zeitattribute (erstellt + zuletzt bearbeitet)
     -> wenn sie Zeitattribut besitzen kann man Erstellzeitpunkt mit einblenden
     -> Notizen können noch nicht nach Erstellzeitpunkt sortiert werden oder 
     nach Wiederherstellen aus Papierkorb an entsprechender Stelle einsortiert werden
@@ -35,7 +28,13 @@ Als kleiner Zusatz wurde noch ein Fadeout am unteren Bildschirmrand eingefügt, 
     -> Prioritätenattribut zu jeder Notiz
     -> daraus resultierend: Sortierfunktion ("Wichtige Notizen zuerst", "Absteigend nach Priorität")
     -> daraus resultierend: Filterfunktion ("Nur wichtige Notizen anzeigen")
-- Querformatfunktionalität fehlt bisher -> Querformat funktioniert, allerdings rutscht NavBar noch nicht zur Seite und "Neue Notiz"-Popup löst Pixel Overflow beim Öffnen der Tastatur aus
+
+### Designprobleme:
+- wenn sich Text über mehrere Zeilen erstreckt, dann könnte die Schriftgröße verkleinert werden um Platz zu sparen und übersichtlicher zu wirken
+- "Neue Notiz"-Button über oberster Notiz als eigenes Zeilenelement, und wenn gerade nicht sichtbar, dann soll wieder rechts unten das Plus zu sehen sein
+- Bulletpoints für Löschfunktionalität werden durch Swipebewegung von links nach rechts ersetzt, um Notizen in Papierkorb zu verschieben
+- Notizen könnten (unabhängig von ihren Prioritäten) nach oben oder untern verschoben werden (Auswahl-Optionsmenü einrichten und Sidemarker rechts an den Notizen zum grabben und verschieben einblenden + Bulletpoints für weitere Optionen links; Bulletpoints: erst möglich, wenn Swipebewegung zum Löschen die bisherigen Bulletpoints abgelöst hat
+-> ALTERNATIVE: lang auf eine Notiz tippen und halten, um sie nach oben/unten zu verschieben. Zusätzliches Optionsmenü oben rechts, um u.a. Auswahlansicht mit Bulletpoints für Notizen zu aktivieren
 
 ## NICE TO HAVE:
 - App-Widget noch default Flutter Icon
@@ -45,14 +44,18 @@ Als kleiner Zusatz wurde noch ein Fadeout am unteren Bildschirmrand eingefügt, 
 -> anschließend an diese Erweiterung könnte man eine Benachrichtigung in der Benachrichtigungsleiste anzeigen lassen, sobald die Deadline in einem bestimmten Zeitraum erreicht wird ("Fällig in 3 Tagen: Steuer einreichen!")
 
 ## Im Betrieb erkannte Leistungsprobleme:
+
+### Statusprobleme:
 - während man eine Notiz bearbeitet, kann der Floating Action Button betätigt werden, um eine neue Notiz anzulegen. Während der Bearbeitung einer Notiz sollte das nicht erlaubt sein
 - andere Notizen können während des Bearbeitens einer Notiz noch gelöscht werden
 - neue Notizen können während des Bearbeitens einer Notiz erstellt werden
-- im Bearbeitungszustand: Notiz hat keinen Mindestabstand zur Tastatur/rutscht nicht auf Tastaturniveau hoch (wichtig für unteren Notizen)
 - Papierkorb-Icon soll nicht angezeigt werden, wenn keine Notizen im Papierkorb sind 
+
+### Funktionalität / Logik
+- im Bearbeitungszustand: Notiz hat keinen Mindestabstand zur Tastatur/rutscht nicht auf Tastaturniveau hoch (wichtig für unteren Notizen)
 - in seltenen Fällen kann es vorkommen, dass wenn eine Notiz nach mehrmaligem antippen des Bulletpoints erst in den Papierkorb verschoben wird, diese Notiz mehrmals in den Papierkorb verschoben wurde (praktisch Duplizierung einer einzelnen Notiz)
     -> mögliche Lösung: zum Löschen ausgewählte Notizen werden in Queue verschoben, die ca. 2 Sekunden nach dem die letzte Notiz gequeued wurde die Notizen gesammelt in den Papierkorb verschiebt. Fehler durch mehrmaliges inqueuen werden durch Queue Bedingungen abgefangen (wichtigste Bedingung: es dürfen keine Notizen mit der selben ID in die Queue verschoben werden). Positiver Nebeneffekt: ressourceneffizienter/weniger rechenintensiv durch weniger Dateiarbeit
-- Bulletpoint Feld zum Löschen und Wiederherstellen der Notizen sollte vergrößert werden (nicht sichtbar), um ungenaue Tippeingaben abzufangen
+- Zwischenlösung: Bulletpoint Feld zum Löschen und Wiederherstellen der Notizen sollte vergrößert werden (nicht sichtbar), um ungenaue Tippeingaben abzufangen
 
 # INSTALLATION DER APP
 BrainBox wurde unter Windows 10 in MS Visual Studio Code programmiert in Verbindung mit Flutter Extensions und Android Studio. Folgen Sie der Installationsanleitung unter https://docs.flutter.dev/get-started/install. Nach dem alle Installationsschritte befolgt wurden, die SDK in VS Code eingebunden und das Repository geforkt wurde können sie die App im Emulator ausführen.
