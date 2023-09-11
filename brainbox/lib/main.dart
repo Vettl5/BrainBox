@@ -251,63 +251,74 @@ class _MyHomePageState extends State<MyHomePage> {                //State Klasse
 
   @override
   Widget build(BuildContext context) {
-    
-    //je nach ausgewähltem BottomNavigationBar Element wird die entsprechende Seite zugewiesen und neu geladen
-    Widget page;
-    switch (selectedIndex) {
-    case 0:
-      page = NotizenUebersicht();                                 //Notizenübersicht, Startseite
-      break;
-    case 1:
-      page = PapierkorbUebersicht();                              //Einstellungen öffnen
-      break;
-    default:
-      throw UnimplementedError('No widget for $selectedIndex');   //Just in case
-    }
+    // Um die Bildschirmausrichtung (Hoch-/Querformat) zu überwachen
+    return OrientationBuilder(
+      builder: (BuildContext context, Orientation orientation) {
+        // Jetzt können Sie die Bildschirmausrichtung verwenden, um Ihre UI anzupassen
+        bool isLandscape = orientation == Orientation.landscape;
 
-    //variable mainArea wird erstellt, welche die sich dynamisch ändernde Startseite (page) enthält
-    var mainArea = ColoredBox(
-      color: Theme.of(context).colorScheme.primary,
-      child: Container(
-        color: Theme.of(context).colorScheme.primaryContainer,
-        child: page,
-      ),
-    );
+        // Abhängig von isLandscape oder anderen Kriterien können Sie entscheiden,
+        // welche Seite angezeigt werden soll, und Ihre UI entsprechend anpassen.
 
-    return SafeArea(
-      child: Scaffold(
+        
+        //je nach ausgewähltem BottomNavigationBar Element wird die entsprechende Seite zugewiesen und neu geladen
+        Widget page;
+        switch (selectedIndex) {
+        case 0:
+          page = NotizenUebersicht();                                 //Notizenübersicht, Startseite
+          break;
+        case 1:
+          page = PapierkorbUebersicht();                              //Einstellungen öffnen
+          break;
+        default:
+          throw UnimplementedError('No widget for $selectedIndex');   //Just in case
+        }
 
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            return Column(
-              children: [
-                Expanded(child: mainArea),                    //mainArea wird in Spalte eingefügt, AppBar ist in Seiten enthalten
+        //variable mainArea wird erstellt, welche die sich dynamisch ändernde Startseite (page) enthält
+        var mainArea = ColoredBox(
+          color: Theme.of(context).colorScheme.primary,
+          child: Container(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: page,
+          ),
+        );
+
+        return SafeArea(
+          child: Scaffold(
+
+            body: LayoutBuilder(
+              builder: (context, constraints) {
+                return Column(
+                  children: [
+                    Expanded(child: mainArea),                    //mainArea wird in Spalte eingefügt, AppBar ist in Seiten enthalten
+                  ],
+                );
+              },
+            ),
+
+            bottomNavigationBar: BottomNavigationBar(
+              backgroundColor: Color.fromARGB(255, 167, 213, 255),
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(                          //Notizenübesicht, Startseite (default)
+                  icon: Icon(Icons.menu),         
+                  label: 'Notizen',
+                ),
+                BottomNavigationBarItem(                          //Neue Notiz anlegen
+                  icon: Icon(Icons.delete),     
+                  label: 'Papierkorb',
+                ),
               ],
-            );
-          },
-        ),
-
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Color.fromARGB(255, 167, 213, 255),
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(                          //Notizenübesicht, Startseite (default)
-              icon: Icon(Icons.menu),         
-              label: 'Notizen',
+              currentIndex: selectedIndex,       
+              onTap: (value) {                     
+                setState(() {                     
+                  selectedIndex = value;                          //selectedIndex wird auf den Wert von value gesetzt, entsprechende page im nächsten reload     
+                  print(value);                                   //Ausgabe des Wertes von value in der Konsole, nur zur Kontrolle                   
+                });
+              },
             ),
-            BottomNavigationBarItem(                          //Neue Notiz anlegen
-              icon: Icon(Icons.delete),     
-              label: 'Papierkorb',
-            ),
-          ],
-          currentIndex: selectedIndex,       
-          onTap: (value) {                     
-            setState(() {                     
-              selectedIndex = value;                          //selectedIndex wird auf den Wert von value gesetzt, entsprechende page im nächsten reload     
-              print(value);                                   //Ausgabe des Wertes von value in der Konsole, nur zur Kontrolle                   
-            });
-          },
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
