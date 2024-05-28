@@ -1,5 +1,5 @@
 # BrainBox
-Notizen-App, die in Zusammenhang mit einem Uniprojekt entstanden ist
+Notizen-App
 
 # ÜBER DIE APP
 
