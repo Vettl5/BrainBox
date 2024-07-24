@@ -3,7 +3,7 @@ Notizen-App
 
 # ÜBER DIE APP
 
-Diese App wurde im Rahmen eines Uni-Projektes angelegt und programmiert.
+Diese App wurde im Rahmen eines Uni-Projektes angelegt und programmiert. (erhaltene Note: 1,7)
 Im Grunde ist es eine einfache Notizenapp, in der man neue Notizen anlegen und sie ebenfalls bearbeiten oder löschen kann. Es gab anfangs verschiedene Ideen, wie diese App umgesetzt werden könnte und welche Funktionen sie darüber hinaus beinhalten könnte. Ursprünglich sollte mit jeder neu erstellten Notiz eine neue Notizdatei generiert werden, die beim öffnen einen Arbeitsbereich bietet für bulletpoints, lange Texte oder Checklisten. Allerdings wurde dieser Ansatz im Laufe der Zeit verworfen auf Grund von Komplexität und Zeit.
 
 Es gibt 2 Pages: eine Notizenübersicht und eine Papierkorbübersicht. In der Notizenübersicht befinden sich alle erstellten Notizen in chronologischer Reihenfolge ihrer Erstellung. Jede Notiz besitzt einen Bulletpoint,  einen Text (vom Nutzer vergeben) und einen Edit-Button. Wenn der Edit-Button gedrückt wurde, wird der Text zu einem Eingabefeld, das standardmäßig den Text der Notiz beinhaltet. Von hier aus kann man den Text bearbeiten. Der Edit-Button ist nun ein Speicher-Button und kann betätigt werden, wenn man seine Änderungen am Notizentext bestätigen möchte. Falls der Bulletpoint einer Notiz betätigt wird, wird die betreffende Notiz in den Papierkorb verschoben und verschwindet aus der Notizenübersicht. In der Papierkorbübersicht hat man dann die Möglichkeit, gelöschte Notizen durch betätigen der Bulletpoints wiederherzustellen oder alle Notizen permanent zu löschen.
